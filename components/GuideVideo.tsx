@@ -1,5 +1,6 @@
 "use client";
 
+import { playUrl } from "@/lib/video";
 import { useEffect, useRef, useState } from "react";
 import { Play, X } from "lucide-react";
 import { useTheme } from "@/lib/theme";
@@ -79,7 +80,7 @@ export default function GuideVideo({
             </button>
             <video
               key={src}
-              src={src}
+              src={playUrl(src)}
               controls
               autoPlay
               playsInline

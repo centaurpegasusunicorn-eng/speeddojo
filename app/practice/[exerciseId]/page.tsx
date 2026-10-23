@@ -1,5 +1,6 @@
 "use client";
 
+import { playUrl } from "@/lib/video";
 import { useRef, useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -108,12 +109,13 @@ export default function PracticePage() {
   // load, fall back to the light one rather than showing a broken player.
   const theme = useTheme();
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const videoSrc =
+  const videoFile =
     theme === "dark" &&
     exercise?.videoUrlDark &&
     exercise.videoUrlDark !== failedSrc
       ? exercise.videoUrlDark
       : exercise?.videoUrl ?? "";
+  const videoSrc = playUrl(videoFile);
   // Where to pick up after a light/dark swap: position + whether it was playing
   const resumeRef = useRef<{ time: number; playing: boolean } | null>(null);
 
@@ -632,7 +634,7 @@ export default function PracticePage() {
               ref={videoRef}
               className="w-full h-full"
               onError={() => {
-                if (videoSrc !== exercise.videoUrl) setFailedSrc(videoSrc);
+                if (videoFile !== exercise.videoUrl) setFailedSrc(videoFile);
               }}
               onLoadedMetadata={() => {
                 if (videoRef.current) {
