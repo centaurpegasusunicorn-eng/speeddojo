@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { BELTS, type Belt } from "@/lib/belts";
 import { EXERCISES } from "@/lib/mockData";
+import { Camera } from "lucide-react";
+import BeltPhoto from "@/components/BeltPhoto";
 
 /*
  * THE BELT-UP CELEBRATION
@@ -37,6 +39,9 @@ export default function BeltUpOverlay({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [closing, setClosing] = useState(false);
+  const [photo, setPhoto] = useState(false);
+  const photoRef = useRef(false);
+  photoRef.current = photo;
 
   const close = () => {
     if (closing) return;
@@ -48,6 +53,11 @@ export default function BeltUpOverlay({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       e.stopPropagation();
+      if (photoRef.current) {
+        // the photo screen is open: Esc closes just that
+        if (e.key === "Escape") setPhoto(false);
+        return;
+      }
       if (e.key === "Escape" || e.key === "Enter") {
         e.preventDefault();
         close();
@@ -238,20 +248,48 @@ export default function BeltUpOverlay({
           </p>
         </div>
 
-        <button
-          ref={buttonRef}
-          type="button"
-          onClick={close}
-          className="mt-8 sm:mt-10 rounded-full px-9 py-3.5 text-lg font-bold text-black transition hover:scale-[1.04] active:scale-[0.98] outline-none focus-visible:ring-4 focus-visible:ring-white/40"
-          style={{
-            background: GOLD,
-            boxShadow: `0 8px 30px color-mix(in oklab, ${GOLD} 45%, transparent)`,
-            animation: "buRise 0.5s 2.7s ease-out both",
-          }}
+        <div
+          className="mt-8 sm:mt-10 flex flex-col-reverse sm:flex-row items-center gap-3 sm:gap-4"
+          style={{ animation: "buRise 0.5s 2.7s ease-out both" }}
         >
-          Continue
-        </button>
+          <button
+            type="button"
+            onClick={() => setPhoto(true)}
+            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-lg font-bold text-white bg-white/10 hover:bg-white/20 transition outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+          >
+            <Camera size={20} aria-hidden /> Take your belt photo
+          </button>
+          <button
+            ref={buttonRef}
+            type="button"
+            onClick={close}
+            className="rounded-full px-9 py-3.5 text-lg font-bold text-black transition hover:scale-[1.04] active:scale-[0.98] outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+            style={{
+              background: GOLD,
+              boxShadow: `0 8px 30px color-mix(in oklab, ${GOLD} 45%, transparent)`,
+            }}
+          >
+            Continue
+          </button>
+        </div>
       </div>
+
+      {photo && (
+        <BeltPhoto
+          beltName={belt.name}
+          beltColor={belt.color}
+          beltIndex={index}
+          allBelts={BELTS}
+          line={
+            isBlack
+              ? "All 12 belts earned"
+              : exercise
+              ? `${exercise.name} mastered at ${exercise.endBpm} BPM`
+              : `Belt ${index + 1} of ${total}`
+          }
+          onClose={() => setPhoto(false)}
+        />
+      )}
     </div>
   );
 }
