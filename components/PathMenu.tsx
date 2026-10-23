@@ -2,12 +2,28 @@
 
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BELTS, REPS_TO_COMPLETE, type PathState } from "@/lib/belts";
+import { BELTS, REPS_TO_COMPLETE, textOn, type PathState } from "@/lib/belts";
 import { useTheme } from "@/lib/theme";
 
 // Neutral greys for each theme (belt colours and the red trail stay the same)
 const LIGHT = { trail: "#AEAEAE", lockFill: "#F5F5F5", lockEdge: "#D4D4D4", ink: "#171717", paper: "var(--background)", track: "#EDEDED" };
 const DARK = { trail: "#666666", lockFill: "#3D3D3D", lockEdge: "#666666", ink: "#EDEDED", paper: "var(--background)", track: "#262626" };
+
+// Padlock on paid belts (students without the full dojo)
+const PADLOCK_LIGHT = "#8A8A8A";
+const PADLOCK_DARK = "#A3A3A3";
+const PADLOCK_SIZE = 1; // 1 = fills most of the dot
+
+/** A small padlock centred on (x, y), r = the dot's radius */
+function Padlock({ x, y, r, color }: { x: number; y: number; r: number; color: string }) {
+  const s = r * 0.95 * PADLOCK_SIZE;
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s})`} pointerEvents="none" aria-hidden>
+      <path d="M-0.3 -0.02 V-0.28 A0.3 0.3 0 0 1 0.3 -0.28 V-0.02" fill="none" stroke={color} strokeWidth={0.17} />
+      <rect x={-0.46} y={-0.06} width={0.92} height={0.64} rx={0.13} fill={color} />
+    </g>
+  );
+}
 
 /*
  * The winding path of belts. One stop per exercise, in order:
@@ -61,12 +77,15 @@ export default function PathMenu({
   path,
   currentId,
   straight = false,
+  paidFrom,
 }: {
   exercises: { id: string; name?: string }[];
   path: PathState;
   currentId?: string;
   /** Phones: a straight row with the selected belt's name underneath */
   straight?: boolean;
+  /** Belts from this index on get a padlock (not a member yet) */
+  paidFrom?: number;
 }) {
   const pos = straight ? straightPos : wavePos;
   // drawing box: [left, top, width, height]
@@ -130,6 +149,9 @@ export default function PathMenu({
         const unlocked = i <= path.currentIndex;
         const isCurrent = i === path.currentIndex;
         const selected = ex.id === currentId;
+        const paid = paidFrom !== undefined && i >= paidFrom;
+        const padColor = dark ? PADLOCK_DARK : PADLOCK_LIGHT;
+        const paidNote = paid ? " · full dojo" : "";
 
         if (!unlocked && i === n - 1) {
           // The goal: a bold bullseye so it stands out even while locked
@@ -143,7 +165,7 @@ export default function PathMenu({
 
         if (!unlocked) {
           return (
-            <g key={ex.id} aria-disabled="true" aria-label={`${belt.name} belt, locked`} {...hover(x, y, `${belt.name} belt · locked`)}>
+            <g key={ex.id} aria-disabled="true" aria-label={`${belt.name} belt, locked`} {...hover(x, y, `${belt.name} belt · locked${paidNote}`)}>
               <circle
                 cx={x}
                 cy={y}
@@ -152,6 +174,7 @@ export default function PathMenu({
                 stroke={c.lockEdge}
                 strokeWidth={1.4}
               />
+              {paid && <Padlock x={x} y={y} r={14 * K} color={padColor} />}
             </g>
           );
         }
@@ -173,7 +196,7 @@ export default function PathMenu({
             tabIndex={0}
             aria-label={`${belt.name} belt, exercise ${i + 1}${
               progress.completed ? ", completed" : ", in progress"
-            }`}
+            }${paid ? ", part of the full dojo" : ""}`}
             onClick={open}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
@@ -181,7 +204,7 @@ export default function PathMenu({
                 open();
               }
             }}
-            {...hover(x, y, `${belt.name} belt`)}
+            {...hover(x, y, `${belt.name} belt${paidNote}`)}
             // No focus box on mouse click; keyboard users get the red ring below
             className="group cursor-pointer outline-none"
           >
@@ -252,6 +275,7 @@ export default function PathMenu({
                   strokeWidth={5 * C}
                   filter={`url(#${shadowId})`}
                 />
+                {paid && <Padlock x={x} y={y} r={16 * C} color={belt.color} />}
               </>
             ) : (
               <>
@@ -266,6 +290,11 @@ export default function PathMenu({
                   fill={belt.color}
                   filter={`url(#${shadowId})`}
                 />
+                {paid && (
+                  <g opacity={0.75}>
+                    <Padlock x={x} y={y} r={(selected ? 21 : 18) * K} color={textOn(belt.color)} />
+                  </g>
+                )}
               </>
             )}
           </g>

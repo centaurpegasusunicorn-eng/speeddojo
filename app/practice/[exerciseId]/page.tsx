@@ -136,6 +136,8 @@ export default function PracticePage() {
     !access.member &&
     !isFree(EXERCISES.findIndex((e) => e.id === exercise?.id));
   const videoSrc = access && !lockedOut ? playUrl(videoFile) : "";
+  // padlocks on the belt path for paid belts
+  const paidFrom = access?.paywall && !access.member ? PRICING.FREE_EXERCISES : undefined;
   // Where to pick up after a light/dark swap: position + whether it was playing
   const resumeRef = useRef<{ time: number; playing: boolean } | null>(null);
 
@@ -619,10 +621,10 @@ export default function PracticePage() {
         <div>
           {/* phones: a straight row that fits the screen; wider screens: the winding trail */}
           <div className="sm:hidden pt-2">
-            <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} straight />
+            <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} paidFrom={paidFrom} straight />
           </div>
           <div className="hidden sm:block">
-            <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} />
+            <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} paidFrom={paidFrom} />
           </div>
         </div>
 
