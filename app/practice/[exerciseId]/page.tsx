@@ -58,6 +58,7 @@ export default function PracticePage() {
   const userIdRef = useRef<string | null>(null);
   const tempoAnim = useRef<number | null>(null); // "Set to my best" sweep
 
+
   // Keyboard shortcuts (see handleShortcut below). One listener for the
   // page; it always calls the latest version of the handler.
   const shortcutRef = useRef<(e: KeyboardEvent) => void>(() => {});
@@ -344,6 +345,16 @@ export default function PracticePage() {
     })();
   }, [exercise?.id, router]);
 
+  // Phones: the belt path scrolls sideways; start it at the current belt
+  const pathScrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = pathScrollRef.current;
+    if (loading || !el || el.scrollWidth <= el.clientWidth) return;
+    const idx = Math.min(pathState(EXERCISES, reps).currentIndex, EXERCISES.length - 1);
+    const frac = idx / (EXERCISES.length - 1);
+    el.scrollLeft = frac * (el.scrollWidth - el.clientWidth);
+  }, [loading, reps]);
+
   if (!exercise) {
     return (
       <main className="w-full px-8 py-10">
@@ -372,6 +383,7 @@ export default function PracticePage() {
     ? Math.round((cleanReps.length / exerciseReps.length) * 100)
     : 0;
   const path = pathState(EXERCISES, reps);
+
   const exIndex = EXERCISES.findIndex((e) => e.id === exercise.id);
   const exProgress = path.progress[exIndex];
   const thisBelt = BELTS[Math.min(exIndex, BELTS.length - 1)];
@@ -499,18 +511,63 @@ export default function PracticePage() {
     setShowPrompt(false);
   }
 
+  // "Log your rep" prompt once a rep ends, otherwise the countdown. Shown
+  // beside the path on desktop, and right under the video on phones/tablets.
+  const promptArea = (showPrompt ? (
+            <div className="flex items-center gap-5">
+            <RepCue belt={thisBelt} />
+            <div className="flex flex-col items-start">
+              <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
+                Log your rep:
+              </p>
+              <p className="text-neutral-700 dark:text-neutral-300 mb-2">
+                Played it clean, zero mistakes?
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => logRep(true)}
+                  disabled={saving}
+                  className="inline-flex items-center border border-neutral-300 dark:border-neutral-600 font-bold px-5 py-3 rounded-lg text-sm disabled:opacity-50"
+                >
+                  YES<kbd className="ml-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded border border-current/30 text-[11px] font-semibold opacity-60 [@media(pointer:coarse)]:hidden">Y</kbd>
+                </button>
+                <button
+                  onClick={() => logRep(false)}
+                  disabled={saving}
+                  className="inline-flex items-center bg-neutral-200 dark:bg-neutral-800 font-bold px-5 py-3 rounded-lg text-sm disabled:opacity-50"
+                >
+                  NO<kbd className="ml-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded border border-current/30 text-[11px] font-semibold opacity-60 [@media(pointer:coarse)]:hidden">N</kbd>
+                </button>
+              </div>
+              {saveError && (
+                <p role="alert" className="mt-2 text-sm text-red-600 dark:text-red-400">
+                  Couldn&apos;t save that rep. Check your connection and tap again.
+                </p>
+              )}
+            </div>
+            </div>
+          ) : (
+            <Countdown key={exercise.id} videoRef={videoRef} />
+          ));
+
   return (
-    <main className="w-full px-8 pb-10">
+    <main className="w-full px-4 sm:px-6 lg:px-8 pb-10">
       {/* Header: belt bar flush to the top, logo left, belt + stats grouped right */}
-      <div className="flex flex-wrap items-start justify-between gap-6 pb-6">
+      {/* Phones/tablets: logo + buttons on top, belt + stats on a swipeable row below */}
+      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 pb-5 lg:pb-6">
         <Link
           href="/dashboard"
-          className="h-20 flex items-center text-xl tracking-[0.3em] text-neutral-800 dark:text-neutral-200 font-light"
+          className="order-1 h-14 lg:h-20 flex items-center text-lg lg:text-xl tracking-[0.25em] lg:tracking-[0.3em] text-neutral-800 dark:text-neutral-200 font-light"
         >
           {BRAND.name.toUpperCase()}
         </Link>
 
-        <div className="flex items-start gap-3">
+        <div className="order-2 h-14 flex items-center gap-1 lg:hidden">
+          <ThemeToggle />
+          <SignOutButton />
+        </div>
+
+        <div className="order-3 w-full lg:order-2 lg:w-auto min-w-0 flex items-start gap-3">
           <div
             ref={stripRef}
             data-base={stripColor}
@@ -527,70 +584,46 @@ export default function PracticePage() {
                 setPulseOn((v) => !v);
               }
             }}
-            className="w-8 h-20 cursor-pointer shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]"
+            className="shrink-0 w-6 h-16 lg:w-8 lg:h-20 cursor-pointer shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]"
             style={{ backgroundColor: stripColor }}
           />
-          <div className="h-20 flex items-center gap-4">
-            <span className="text-lg text-neutral-700 dark:text-neutral-300 mr-2">{stripLabel}</span>
+          <div className="h-16 lg:h-20 min-w-0 flex-1 flex items-center gap-2 lg:gap-4 overflow-x-auto [scrollbar-width:none] lg:overflow-visible">
+            <span className="shrink-0 whitespace-nowrap text-base lg:text-lg text-neutral-700 dark:text-neutral-300 mr-1 lg:mr-2">{stripLabel}</span>
             <StatPill label="Personal best" value={`${personalBest || "—"} bpm`} />
             <StatPill label="Clean rate" value={`${cleanRate}%`} />
             <StatPill label="Streak" value={`${streak} days`} />
             <StatPill label="Practised today" value={formatDuration(todaySeconds)} />
-            <ThemeToggle className="ml-2" />
-            <SignOutButton className="-ml-2" />
+            <span className="hidden lg:contents">
+              <ThemeToggle className="ml-2" />
+              <SignOutButton className="-ml-2" />
+            </span>
           </div>
         </div>
       </div>
 
       {/* Path (over the video) + Log-your-rep prompt (over the dial, only once the rep has finished) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,calc((100%_-_2rem)*var(--right-col)/100))] gap-8 items-center mb-4" style={{ "--right-col": RIGHT_COLUMN_PERCENT } as React.CSSProperties}>
-        <div>
-          <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} />
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,calc((100%_-_2rem)*var(--right-col)/100))] gap-4 lg:gap-8 items-center mb-4" style={{ "--right-col": RIGHT_COLUMN_PERCENT } as React.CSSProperties}>
+        {/* phones: the path keeps a readable size and scrolls sideways */}
+        <div
+          ref={pathScrollRef}
+          className="max-sm:overflow-x-auto max-sm:-mx-4 max-sm:px-4 max-sm:pt-3 max-sm:pb-1 [scrollbar-width:none]"
+        >
+          <div className="max-sm:min-w-[620px]">
+            <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} />
+          </div>
         </div>
 
-        <div className="min-h-[4.5rem] flex items-center">
-          {showPrompt ? (
-            <div className="flex items-center gap-5">
-            <RepCue belt={thisBelt} />
-            <div className="flex flex-col items-start">
-              <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
-                Log your rep:
-              </p>
-              <p className="text-neutral-700 dark:text-neutral-300 mb-2">
-                Played it clean, zero mistakes?
-              </p>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => logRep(true)}
-                  disabled={saving}
-                  className="inline-flex items-center border border-neutral-300 dark:border-neutral-600 font-bold px-5 py-3 rounded-lg text-sm disabled:opacity-50"
-                >
-                  YES<kbd className="ml-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded border border-current/30 text-[11px] font-semibold opacity-60">Y</kbd>
-                </button>
-                <button
-                  onClick={() => logRep(false)}
-                  disabled={saving}
-                  className="inline-flex items-center bg-neutral-200 dark:bg-neutral-800 font-bold px-5 py-3 rounded-lg text-sm disabled:opacity-50"
-                >
-                  NO<kbd className="ml-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded border border-current/30 text-[11px] font-semibold opacity-60">N</kbd>
-                </button>
-              </div>
-              {saveError && (
-                <p role="alert" className="mt-2 text-sm text-red-600 dark:text-red-400">
-                  Couldn&apos;t save that rep. Check your connection and tap again.
-                </p>
-              )}
-            </div>
-            </div>
-          ) : (
-            <Countdown key={exercise.id} videoRef={videoRef} />
-          )}
+        <div className="hidden lg:flex min-h-[4.5rem] items-center">
+          {promptArea}
         </div>
       </div>
 
       {/* Main grid: video 3/4, gauge+chart 1/4 */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,calc((100%_-_2rem)*var(--right-col)/100))] gap-8" style={{ "--right-col": RIGHT_COLUMN_PERCENT } as React.CSSProperties}>
-        <div>
+      {/* Phones/tablets: one column in practice order (video, rep prompt,
+          dial, training card, chart, mixer...). The two desktop columns use
+          "contents" below lg so their pieces can be reordered. */}
+      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,calc((100%_-_2rem)*var(--right-col)/100))] lg:gap-8" style={{ "--right-col": RIGHT_COLUMN_PERCENT } as React.CSSProperties}>
+        <div className="contents lg:block">
           <div
             role="button"
             tabIndex={0}
@@ -602,7 +635,7 @@ export default function PracticePage() {
                 togglePlay();
               }
             }}
-            className="relative rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden aspect-video flex items-center justify-center mb-4 cursor-pointer"
+            className="order-1 relative rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden aspect-video flex items-center justify-center lg:mb-4 cursor-pointer"
           >
             <video
               key={exercise.id}
@@ -628,6 +661,12 @@ export default function PracticePage() {
             )}
           </div>
 
+          {/* rep prompt / countdown sits right under the video on phones */}
+          {(showPrompt || !paused) && (
+            <div className="order-2 lg:hidden -mt-2 flex justify-center">{promptArea}</div>
+          )}
+
+          <div className="order-4 -mt-6 lg:mt-0">
           <NowTraining
             exercise={exercise}
             index={exIndex}
@@ -638,10 +677,12 @@ export default function PracticePage() {
             // the guide video plays at normal speed: pause the exercise first
             onGuideOpen={() => videoRef.current?.pause()}
           />
+          </div>
         </div>
 
-        <div>
-          <div className="flex justify-center mb-4">
+        <div className="contents lg:block">
+          <div className="order-3 flex justify-center lg:mb-4">
+            <div className="w-full max-w-[300px] sm:max-w-[380px] lg:max-w-none flex justify-center">
             <BpmGauge
               key={exercise.id}
               videoRef={videoRef}
@@ -658,15 +699,18 @@ export default function PracticePage() {
               }
               onJumpToBest={sweepTo}
             />
+            </div>
           </div>
 
+          <div className="order-5">
           <ProgressChart
             reps={exerciseReps}
             sessions={timeEntries.filter((t) => t.exerciseId === exercise.id)}
             target={target}
           />
+          </div>
           {/* Audio Mixer + Keyboard Shortcuts, under the progress chart */}
-          <div className="mt-5">
+          <div className="order-6 lg:mt-5">
             <button
               onClick={toggleMixer}
               aria-expanded={mixerOpen}
@@ -754,8 +798,13 @@ export default function PracticePage() {
               </div>
             </div>
           </div>
-          <KeyboardShortcuts />
-          <CommunityLink />
+          {/* no keyboard on phones/tablets */}
+          <div className="order-7 -mt-6 lg:mt-0 [@media(pointer:coarse)]:hidden">
+            <KeyboardShortcuts />
+          </div>
+          <div className="order-8 -mt-6 lg:mt-0">
+            <CommunityLink />
+          </div>
         </div>
       </div>
       {debug && (
@@ -777,9 +826,9 @@ export default function PracticePage() {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-neutral-100 dark:bg-neutral-900 rounded-lg pl-4 pr-8 py-2">
-      <p className="text-[15px] text-neutral-500 dark:text-neutral-400">{label}</p>
-      <p className="text-xl font-semibold">{value}</p>
+    <div className="shrink-0 whitespace-nowrap bg-neutral-100 dark:bg-neutral-900 rounded-lg pl-3 pr-5 py-1.5 lg:pl-4 lg:pr-8 lg:py-2">
+      <p className="text-[13px] lg:text-[15px] text-neutral-500 dark:text-neutral-400">{label}</p>
+      <p className="text-lg lg:text-xl font-semibold">{value}</p>
     </div>
   );
 }

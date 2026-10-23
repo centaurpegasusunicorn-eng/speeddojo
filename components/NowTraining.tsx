@@ -51,17 +51,17 @@ export default function NowTraining({
     : 0;
 
   return (
-    <section className="mt-6 rounded-2xl bg-neutral-100 dark:bg-neutral-900 px-6 py-5">
+    <section className="mt-6 rounded-2xl bg-neutral-100 dark:bg-neutral-900 px-4 py-4 sm:px-6 sm:py-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="text-[16px] tracking-[0.2em] uppercase text-neutral-600 dark:text-neutral-400">
           Now training · Exercise {index + 1}
         </p>
 
-        <div className="flex items-center gap-4">
-          <span className="text-[18px] text-neutral-600 dark:text-neutral-400">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 w-full sm:w-auto">
+          <span className="text-[16px] sm:text-[18px] text-neutral-600 dark:text-neutral-400">
             {earned} of {BELTS.length} belts earned
           </span>
-          <div className="flex gap-1 w-[360px] max-w-full" aria-hidden="true">
+          <div className="flex gap-1 w-full sm:w-[360px]" aria-hidden="true">
             {BELTS.map((b, i) => {
               const done = i < path.currentIndex;
               const current = i === path.currentIndex;

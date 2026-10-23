@@ -24,7 +24,7 @@ export default function BeltUpOverlay({
       <p className="text-lg tracking-[0.4em] uppercase mb-4 opacity-80">
         New belt
       </p>
-      <p className="text-7xl md:text-9xl font-bold tracking-tight">
+      <p className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-tight text-center px-4">
         {belt.name} Belt
       </p>
     </div>

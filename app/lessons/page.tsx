@@ -21,7 +21,7 @@ export default async function LessonsPage({
   const ready = LESSON.STRIPE_PAYMENT_LINK !== "";
 
   return (
-    <main className="w-full px-8 pb-16">
+    <main className="w-full px-4 sm:px-8 pb-16">
       <header className="h-20 flex items-center justify-between">
         <Link
           href="/dashboard"

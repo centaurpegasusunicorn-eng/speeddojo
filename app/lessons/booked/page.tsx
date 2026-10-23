@@ -16,7 +16,7 @@ export default function LessonBookedPage() {
   const ready = LESSON.BOOKING_URL !== "";
 
   return (
-    <main className="w-full px-8 pb-16">
+    <main className="w-full px-4 sm:px-8 pb-16">
       <header className="h-20 flex items-center justify-between">
         <Link
           href="/dashboard"
