@@ -8,6 +8,8 @@ import {
   BarElement,
   LineElement,
   PointElement,
+  BarController,
+  LineController,
   Tooltip,
   Legend,
   type Plugin,
@@ -17,12 +19,16 @@ import { Rep } from "@/lib/belts";
 import { formatDuration } from "@/lib/format";
 import { useTheme } from "@/lib/theme";
 
+// Every chart type used must be registered. The bar + line controllers are
+// essential: without them the live (optimised) build crashes the page.
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
   LineElement,
   PointElement,
+  BarController,
+  LineController,
   Tooltip,
   Legend
 );
