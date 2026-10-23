@@ -345,16 +345,6 @@ export default function PracticePage() {
     })();
   }, [exercise?.id, router]);
 
-  // Phones: the belt path scrolls sideways; start it at the current belt
-  const pathScrollRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = pathScrollRef.current;
-    if (loading || !el || el.scrollWidth <= el.clientWidth) return;
-    const idx = Math.min(pathState(EXERCISES, reps).currentIndex, EXERCISES.length - 1);
-    const frac = idx / (EXERCISES.length - 1);
-    el.scrollLeft = frac * (el.scrollWidth - el.clientWidth);
-  }, [loading, reps]);
-
   if (!exercise) {
     return (
       <main className="w-full px-8 py-10">
@@ -603,12 +593,12 @@ export default function PracticePage() {
 
       {/* Path (over the video) + Log-your-rep prompt (over the dial, only once the rep has finished) */}
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,calc((100%_-_2rem)*var(--right-col)/100))] gap-4 lg:gap-8 items-center mb-4" style={{ "--right-col": RIGHT_COLUMN_PERCENT } as React.CSSProperties}>
-        {/* phones: the path keeps a readable size and scrolls sideways */}
-        <div
-          ref={pathScrollRef}
-          className="max-sm:overflow-x-auto max-sm:-mx-4 max-sm:px-4 max-sm:pt-3 max-sm:pb-1 [scrollbar-width:none]"
-        >
-          <div className="max-sm:min-w-[620px]">
+        <div>
+          {/* phones: a straight row that fits the screen; wider screens: the winding trail */}
+          <div className="sm:hidden pt-2">
+            <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} straight />
+          </div>
+          <div className="hidden sm:block">
             <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} />
           </div>
         </div>

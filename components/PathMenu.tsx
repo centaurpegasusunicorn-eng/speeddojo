@@ -32,9 +32,20 @@ const PULSE_SPREAD = 2.2; // how far it spreads (x the circle's size)
 // ───────────────────────────────────────────────────────────────────────────
 const C = K * CURRENT_SIZE;
 
-const pos = (i: number) => ({ x: X0 + i * DX, y: i % 2 === 0 ? Y_LO : Y_HI });
+// ─── PHONE VERSION: a straight row that fits the screen ────────────────────
+// Stops sit STRAIGHT_GAP apart in a box STRAIGHT_WIDTH wide (in drawing units).
+// A smaller width makes every dot bigger on screen; keep the gap at roughly
+// STRAIGHT_WIDTH / 12.
+const STRAIGHT_WIDTH = 600;
+const STRAIGHT_GAP = 49;
+// ───────────────────────────────────────────────────────────────────────────
 
-function trail(upTo: number): string {
+type Pt = { x: number; y: number };
+const wavePos = (i: number): Pt => ({ x: X0 + i * DX, y: i % 2 === 0 ? Y_LO : Y_HI });
+const straightPos = (i: number): Pt => ({ x: 30 + i * STRAIGHT_GAP, y: 40 });
+
+function trail(pos: (i: number) => Pt, upTo: number, straight: boolean): string {
+  if (straight) return `M${pos(0).x} ${pos(0).y}L${pos(upTo).x} ${pos(upTo).y}`;
   let d = `M${pos(0).x} ${pos(0).y}`;
   for (let i = 1; i <= upTo; i++) {
     const a = pos(i - 1);
@@ -49,11 +60,17 @@ export default function PathMenu({
   exercises,
   path,
   currentId,
+  straight = false,
 }: {
-  exercises: { id: string }[];
+  exercises: { id: string; name?: string }[];
   path: PathState;
   currentId?: string;
+  /** Phones: a straight row with the selected belt's name underneath */
+  straight?: boolean;
 }) {
+  const pos = straight ? straightPos : wavePos;
+  // drawing box: [left, top, width, height]
+  const box = straight ? [0, 0, STRAIGHT_WIDTH, 80] : [0, 264, 1200, 112];
   const router = useRouter();
   const dark = useTheme() === "dark";
   const c = dark ? DARK : LIGHT;
@@ -63,7 +80,7 @@ export default function PathMenu({
 
   // Hover label (custom, so it can match the chart's tooltip size/style)
   const [tip, setTip] = useState<{ x: number; y: number; text: string } | null>(null);
-  const hover = (x: number, y: number, text: string) => ({
+  const hover = (x: number, y: number, text: string) => straight ? {} : ({
     onMouseEnter: () => setTip({ x, y, text }),
     onMouseLeave: () => setTip(null),
   });
@@ -71,7 +88,7 @@ export default function PathMenu({
   return (
     <div className="relative">
     <svg
-      viewBox="0 264 1200 112"
+      viewBox={box.join(" ")}
       className="block w-full h-auto overflow-visible"
       role="group"
       aria-label="Your path of belts"
@@ -91,7 +108,7 @@ export default function PathMenu({
         </filter>
       </defs>
       <path
-        d={trail(n - 1)}
+        d={trail(pos, n - 1, straight)}
         fill="none"
         stroke={c.trail}
         strokeWidth={3}
@@ -99,7 +116,7 @@ export default function PathMenu({
         strokeLinecap="round"
       />
       <path
-        d={trail(redUpTo)}
+        d={trail(pos, redUpTo, straight)}
         fill="none"
         stroke="#CC1010"
         strokeWidth={4}
@@ -260,13 +277,25 @@ export default function PathMenu({
           role="tooltip"
           className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-[7px] px-2.5 py-[7px] text-[13.8px] leading-tight text-white bg-black dark:bg-neutral-900 dark:border dark:border-neutral-700"
           style={{
-            left: `${(tip.x / 1200) * 100}%`,
-            top: `calc(${((tip.y - 264) / 112) * 100}% - 22px)`,
+            left: `${(tip.x / box[2]) * 100}%`,
+            top: `calc(${((tip.y - box[1]) / box[3]) * 100}% - 22px)`,
           }}
         >
           {tip.text}
         </div>
       )}
+      {straight && (() => {
+        // No hover on touch screens, so name the belt you're viewing
+        const i = exercises.findIndex((e) => e.id === currentId);
+        if (i < 0) return null;
+        const belt = BELTS[Math.min(i, BELTS.length - 1)];
+        return (
+          <p className="mt-1 flex items-center justify-center gap-2 text-[15px] text-neutral-600 dark:text-neutral-400">
+            <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.15)]" style={{ background: belt.color }} />
+            {exercises[i].name ?? `Exercise ${i + 1}`} · {belt.name} Belt
+          </p>
+        );
+      })()}
     </div>
   );
 }
