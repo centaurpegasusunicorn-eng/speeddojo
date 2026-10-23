@@ -620,7 +620,7 @@ export default function PracticePage() {
 
       {/* Main grid: video 3/4, gauge+chart 1/4 */}
       {/* Phones/tablets: one column in practice order (video, rep prompt,
-          dial, training card, chart, mixer...). The two desktop columns use
+          dial, chart, training card, Discord, then mixer + shortcuts last). The two desktop columns use
           "contents" below lg so their pieces can be reordered. */}
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,calc((100%_-_2rem)*var(--right-col)/100))] lg:gap-8" style={{ "--right-col": RIGHT_COLUMN_PERCENT } as React.CSSProperties}>
         <div className="contents lg:block">
@@ -666,7 +666,7 @@ export default function PracticePage() {
             <div className="order-2 lg:hidden -mt-2 flex justify-center">{promptArea}</div>
           )}
 
-          <div className="order-4 -mt-6 lg:mt-0">
+          <div className="order-5 -mt-6 lg:mt-0">
           <NowTraining
             exercise={exercise}
             index={exIndex}
@@ -702,7 +702,7 @@ export default function PracticePage() {
             </div>
           </div>
 
-          <div className="order-5">
+          <div className="order-4">
           <ProgressChart
             reps={exerciseReps}
             sessions={timeEntries.filter((t) => t.exerciseId === exercise.id)}
@@ -710,7 +710,7 @@ export default function PracticePage() {
           />
           </div>
           {/* Audio Mixer + Keyboard Shortcuts, under the progress chart */}
-          <div className="order-6 lg:mt-5">
+          <div className="order-7 lg:mt-5">
             <button
               onClick={toggleMixer}
               aria-expanded={mixerOpen}
@@ -799,10 +799,10 @@ export default function PracticePage() {
             </div>
           </div>
           {/* no keyboard on phones/tablets */}
-          <div className="order-7 -mt-6 lg:mt-0 [@media(pointer:coarse)]:hidden">
+          <div className="order-8 -mt-6 lg:mt-0 [@media(pointer:coarse)]:hidden">
             <KeyboardShortcuts />
           </div>
-          <div className="order-8 -mt-6 lg:mt-0">
+          <div className="order-6 -mt-6 lg:mt-0">
             <CommunityLink />
           </div>
         </div>
