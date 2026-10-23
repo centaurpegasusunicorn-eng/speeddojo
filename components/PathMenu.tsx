@@ -156,9 +156,14 @@ export default function PathMenu({
         if (!unlocked && i === n - 1) {
           // The goal: a bold bullseye so it stands out even while locked
           return (
-            <g key={ex.id} aria-disabled="true" aria-label={`${belt.name} belt, the goal`} {...hover(x, y, `${belt.name} belt · the goal`)}>
+            <g key={ex.id} aria-disabled="true" aria-label={`${belt.name} belt, the goal`} {...hover(x, y, `${belt.name} belt · the goal${paidNote}`)}>
               <circle cx={x} cy={y} r={17} fill={c.paper} stroke={c.ink} strokeWidth={2} />
-              <circle cx={x} cy={y} r={8} fill={c.ink} />
+              {/* paid: a padlock in place of the bullseye's centre */}
+              {paid ? (
+                <Padlock x={x} y={y} r={12} color={c.ink} />
+              ) : (
+                <circle cx={x} cy={y} r={8} fill={c.ink} />
+              )}
             </g>
           );
         }
