@@ -62,3 +62,61 @@ body {
   40% { transform: scale(1.45); }
   100% { transform: scale(1); }
 }
+
+/* ── Belt-up celebration (components/BeltUpOverlay.tsx) ─────────────────── */
+@keyframes buFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes buFadeOut { from { opacity: 1; } to { opacity: 0; transform: scale(1.03); } }
+@keyframes buRaysIn {
+  from { opacity: 0; scale: 0.4; }
+  to { opacity: 1; scale: 1; }
+}
+@keyframes buSpin { to { rotate: 360deg; } }
+@keyframes buShock {
+  0% { opacity: 0; scale: 0.3; }
+  15% { opacity: 1; }
+  100% { opacity: 0; scale: 3.2; }
+}
+@keyframes buShake {
+  0%, 100% { translate: 0 0; }
+  20% { translate: 0 7px; }
+  45% { translate: 0 -4px; }
+  70% { translate: 0 2px; }
+}
+@keyframes buBand {
+  0% { opacity: 0; transform: scaleX(0.05) scaleY(0.6); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: scaleX(1) scaleY(1); }
+}
+@keyframes buKnot {
+  0% { opacity: 0; transform: scale(0.2) rotate(-25deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes buTailL {
+  0% { opacity: 0; transform: rotate(60deg) scaleY(0.3); }
+  100% { opacity: 1; transform: rotate(0) scaleY(1); }
+}
+@keyframes buTailR {
+  0% { opacity: 0; transform: rotate(-60deg) scaleY(0.3); }
+  100% { opacity: 1; transform: rotate(0) scaleY(1); }
+}
+@keyframes buSheen {
+  0% { transform: translateX(0) skewX(-20deg); }
+  55%, 100% { transform: translateX(900px) skewX(-20deg); }
+}
+@keyframes buRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes buSlam {
+  0% { opacity: 0; transform: scale(1.9); letter-spacing: 0.15em; filter: blur(8px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); letter-spacing: -0.025em; }
+}
+@keyframes buPip { from { opacity: 0.2; transform: scaleX(0.3); } to { opacity: 1; transform: scaleX(1); } }
+@keyframes buPipNew {
+  0% { opacity: 0; transform: scale(0.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .belt-up, .belt-up * { animation-duration: 0.01s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+}
