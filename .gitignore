@@ -1,0 +1,23 @@
+# Keeps these out of GitHub
+
+# installed packages (rebuilt by npm install)
+/node_modules
+
+# build output
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# secrets: Supabase/Stripe keys live here, never upload
+.env
+.env*.local
+
+# Mac and editor clutter
+.DS_Store
+*.pem
+npm-debug.log*
+
+# Vercel
+.vercel

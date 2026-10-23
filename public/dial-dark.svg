@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <!-- Dark-mode dial. Same geometry as dial.svg: centre 400,400;
+       groove centre-line r=244 (~45 wide); raised disc edge ~r=268.
+       The red tempo ring and the progress ring are drawn by BpmGauge. -->
+  <defs>
+    <radialGradient id="glow" cx="400" cy="400" r="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0.70" stop-color="#ffffff" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3a3d"/>
+      <stop offset="1" stop-color="#141415"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f1f21"/>
+      <stop offset="1" stop-color="#121213"/>
+    </linearGradient>
+    <linearGradient id="groove" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#1a1a1c"/>
+      <stop offset="1" stop-color="#050505"/>
+    </linearGradient>
+  </defs>
+  <circle cx="400" cy="400" r="360" fill="url(#glow)"/>
+  <!-- raised disc -->
+  <circle cx="400" cy="400" r="270" fill="url(#rim)"/>
+  <circle cx="400" cy="400" r="268" fill="url(#face)"/>
+  <!-- groove the red ring sits in -->
+  <circle cx="400" cy="400" r="244" fill="none" stroke="url(#groove)" stroke-width="46"/>
+  <circle cx="400" cy="400" r="267" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1.5"/>
+  <circle cx="400" cy="400" r="221" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1.5"/>
+  <circle cx="400" cy="400" r="267" fill="none" stroke="#000" stroke-opacity="0.6" stroke-width="1" transform="translate(0 1)"/>
+  <!-- centre face -->
+  <circle cx="400" cy="400" r="220" fill="url(#face)"/>
+</svg>
