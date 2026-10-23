@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { AwsClient } from "aws4fetch";
 import { createClient } from "@/lib/supabase/server";
+import { getAccess } from "@/lib/access";
+import { isFree } from "@/lib/pricing";
+import { EXERCISES } from "@/lib/mockData";
 
 /*
  * Hands the video player a short-lived link to a video.
@@ -10,8 +13,7 @@ import { createClient } from "@/lib/supabase/server";
  * stops working after LINK_HOURS, so links can't be shared around.
  * Without those settings, it falls back to the files in /public.
  *
- * When payments are added, the canWatch() check below is where paid belts
- * get locked to subscribers.
+ * canWatch() below keeps paid belts' videos for members only.
  */
 
 const LINK_HOURS = 6; // long enough for a practice session
@@ -42,7 +44,7 @@ export async function GET(request: NextRequest) {
   if (!data?.claims) {
     return new NextResponse("Please sign in", { status: 401 });
   }
-  if (!canWatch(data.claims.sub, file)) {
+  if (!(await canWatch(file))) {
     return new NextResponse("This video is part of the full dojo", { status: 403 });
   }
 
@@ -65,8 +67,16 @@ export async function GET(request: NextRequest) {
   return res;
 }
 
-// Everyone signed in can watch everything for now.
-// Payments will add: free White belt, everything else for subscribers.
-function canWatch(_userId: string, _file: string): boolean {
-  return true;
+// Free belts' videos are open to every signed-in student; the rest need
+// a membership (once payments are switched on)
+async function canWatch(file: string): Promise<boolean> {
+  const name = `/${file}`;
+  const freeFiles = EXERCISES.filter((_, i) => isFree(i)).flatMap((e) => [
+    e.videoUrl,
+    e.videoUrlDark,
+    e.guideVideoUrl,
+    e.guideVideoUrlDark,
+  ]);
+  if (freeFiles.includes(name)) return true;
+  return (await getAccess()).member;
 }

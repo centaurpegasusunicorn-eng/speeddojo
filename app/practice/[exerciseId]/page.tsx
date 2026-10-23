@@ -36,6 +36,9 @@ import RepCue from "@/components/RepCue";
 import CommunityLink from "@/components/CommunityLink";
 import KeyboardShortcuts from "@/components/KeyboardShortcuts";
 import { BRAND } from "@/lib/brand";
+import { PRICING, isFree } from "@/lib/pricing";
+import UnlockPrompt from "@/components/UnlockPrompt";
+import { Lock } from "lucide-react";
 
 const RED = "#CC1010";
 
@@ -115,7 +118,22 @@ export default function PracticePage() {
     exercise.videoUrlDark !== failedSrc
       ? exercise.videoUrlDark
       : exercise?.videoUrl ?? "";
-  const videoSrc = playUrl(videoFile);
+
+  // Paid belts: is this exercise open to this student? (Everything stays
+  // open until Stripe is set up.) No video loads until we know.
+  const [access, setAccess] = useState<{ paywall: boolean; member: boolean } | null>(null);
+  const [unlockPrompt, setUnlockPrompt] = useState(false);
+  useEffect(() => {
+    fetch("/api/access")
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((a) => setAccess({ paywall: !!a.paywall, member: !!a.member }))
+      .catch(() => setAccess({ paywall: false, member: true }));
+  }, []);
+  const lockedOut =
+    !!access?.paywall &&
+    !access.member &&
+    !isFree(EXERCISES.findIndex((e) => e.id === exercise?.id));
+  const videoSrc = access && !lockedOut ? playUrl(videoFile) : "";
   // Where to pick up after a light/dark swap: position + whether it was playing
   const resumeRef = useRef<{ time: number; playing: boolean } | null>(null);
 
@@ -416,8 +434,12 @@ export default function PracticePage() {
   const gaugeMax = exercise.endBpm;
 
   function togglePlay() {
+    if (lockedOut) {
+      router.push("/unlock");
+      return;
+    }
     const v = videoRef.current;
-    if (!v) return;
+    if (!v || !v.getAttribute("src")) return;
     if (v.paused || v.ended) v.play();
     else v.pause();
   }
@@ -644,7 +666,20 @@ export default function PracticePage() {
                 }
               }}
             />
-            {paused && (
+            {lockedOut && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-neutral-100/95 dark:bg-neutral-900/95 px-6 text-center">
+                <span className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#CC1010] text-white flex items-center justify-center">
+                  <Lock size={22} aria-hidden />
+                </span>
+                <p className="text-lg sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                  The {thisBelt.name} belt is part of the full dojo
+                </p>
+                <span className="rounded-lg px-5 py-2.5 text-[16px] sm:text-[17px] font-semibold bg-[#CC1010] text-white">
+                  {PRICING.cta}
+                </span>
+              </div>
+            )}
+            {paused && !lockedOut && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <svg viewBox="0 0 100 100" className="w-[14.4%] min-w-[58px]" aria-hidden>
                   <polygon points="20,10 90,50 20,90" fill={RED} />
@@ -797,6 +832,16 @@ export default function PracticePage() {
           <div className="order-6 -mt-6 lg:mt-0">
             <CommunityLink />
           </div>
+          {access?.paywall && (
+            <div className="order-9 lg:mt-4">
+              <Link
+                href="/unlock"
+                className="text-[15px] text-neutral-500 dark:text-neutral-400 hover:underline"
+              >
+                {access.member ? "Membership and billing" : "Unlock all 12 belts"}
+              </Link>
+            </div>
+          )}
         </div>
       </div>
       {debug && (
@@ -811,7 +856,20 @@ export default function PracticePage() {
         </button>
       )}
 
-      {beltUp && <BeltUpOverlay belt={beltUp} onDone={() => setBeltUp(null)} />}
+      {beltUp && (
+        <BeltUpOverlay
+          belt={beltUp}
+          onDone={() => {
+            // Just earned the last free belt? Invite them to the full dojo
+            const lastFree = BELTS[PRICING.FREE_EXERCISES - 1];
+            if (access?.paywall && !access.member && beltUp.name === lastFree?.name) {
+              setUnlockPrompt(true);
+            }
+            setBeltUp(null);
+          }}
+        />
+      )}
+      {unlockPrompt && <UnlockPrompt onClose={() => setUnlockPrompt(false)} />}
     </main>
   );
 }

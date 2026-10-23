@@ -10,7 +10,12 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 
 // Pages anyone can open without signing in
-const PUBLIC_PATHS = ["/login", "/auth", "/forgot-password"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/auth",
+  "/forgot-password",
+  "/api/stripe-webhook", // Stripe calls this; it checks Stripe's signature itself
+];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });

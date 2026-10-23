@@ -3,17 +3,25 @@ import { CalendarCheck } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { LESSON } from "@/lib/lessons";
 import { BRAND } from "@/lib/brand";
+import { paymentsOn, stripe } from "@/lib/stripe";
 
 /*
- * Where Stripe sends students after they pay. Copy lives in lib/lessons.ts.
+ * Where Stripe sends students after they pay for a lesson. Copy lives in
+ * lib/lessons.ts.
  *
- * For now this page doesn't check that a payment actually happened, so
- * someone who found the address could reach your calendar without paying.
- * When we build the Stripe server side (for subscriptions), we'll verify
- * the payment here before showing the booking button.
+ * Once Stripe is set up, the booking button only appears after a real,
+ * paid lesson checkout. For that, the lesson Payment Link's confirmation
+ * page must redirect to:
+ *   https://<your site>/lessons/booked?session_id={CHECKOUT_SESSION_ID}
  */
-export default function LessonBookedPage() {
-  const ready = LESSON.BOOKING_URL !== "";
+export default async function LessonBookedPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { session_id } = await searchParams;
+  const paid = await lessonPaid(session_id);
+  const ready = LESSON.BOOKING_URL !== "" && paid;
 
   return (
     <main className="w-full px-4 sm:px-8 pb-16">
@@ -57,6 +65,13 @@ export default function LessonBookedPage() {
           </span>
         )}
 
+        {!paid && (
+          <p className="mt-3 text-[15px] text-neutral-500 dark:text-neutral-400">
+            We couldn&apos;t find your lesson payment. If you&apos;ve just paid,
+            use the link from your Stripe receipt email or get in touch.
+          </p>
+        )}
+
         <p className="mt-6">
           <Link
             href="/dashboard"
@@ -68,4 +83,17 @@ export default function LessonBookedPage() {
       </div>
     </main>
   );
+}
+
+// A paid checkout from a Payment Link (lessons), made in the last 30 days
+async function lessonPaid(sessionId: string | string[] | undefined) {
+  if (!paymentsOn()) return true; // not set up yet: don't block the page
+  if (typeof sessionId !== "string" || !sessionId.startsWith("cs_")) return false;
+  try {
+    const s = await stripe().checkout.sessions.retrieve(sessionId);
+    const recent = Date.now() / 1000 - s.created < 30 * 86_400;
+    return s.payment_status === "paid" && !!s.payment_link && recent;
+  } catch {
+    return false;
+  }
 }
