@@ -35,11 +35,10 @@ export const PRICING = {
   unlockedBody: "Your progress is saved. Pick up where you left off.",
   unlockedCta: "Start the next belt",
 
-  // The prompt after earning the White belt
-  promptHeadline: "White belt earned!",
-  promptBody: "That's the first step on the path. Unlock the next 11 belts to keep going.",
-  promptCta: "See the full dojo",
-  promptDismiss: "Not now",
+  // The offer in the video space on a locked belt
+  panelHeadline: "Unlock all 12 belts",
+  panelBody: "The White belt was just the start. Keep going, all the way to Black.",
+  panelMore: "What's included",
 };
 
 /** Is this exercise (0 = first) one of the free ones? */
