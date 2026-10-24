@@ -37,6 +37,9 @@ import CommunityLink from "@/components/CommunityLink";
 import KeyboardShortcuts from "@/components/KeyboardShortcuts";
 import { BRAND } from "@/lib/brand";
 import { PROGRAM } from "@/lib/programs";
+import ScenePicker from "@/components/ScenePicker";
+import SceneOverlay from "@/components/SceneOverlay";
+import { loadScene, saveScene, type SceneId } from "@/lib/scenes";
 import { PRICING, isFree } from "@/lib/pricing";
 import UnlockPanel from "@/components/UnlockPanel";
 
@@ -103,6 +106,15 @@ export default function PracticePage() {
     });
   }
   const [guitarVolume, setGuitarVolume] = useState(1);
+  // What the video shows: the note highway, or a calm scene (per exercise)
+  const [scene, setScene] = useState<SceneId>("highway");
+  useEffect(() => {
+    if (params.exerciseId) setScene(loadScene(params.exerciseId));
+  }, [params.exerciseId]);
+  const pickScene = (id: SceneId) => {
+    setScene(id);
+    if (params.exerciseId) saveScene(params.exerciseId, id);
+  };
   const [accents, setAccents] = useState<boolean[]>([true, false, false, false]);
   const [beltUp, setBeltUp] = useState<Belt | null>(null);
   const [debug, setDebug] = useState(false);
@@ -671,6 +683,7 @@ export default function PracticePage() {
                 }
               }}
             />
+            {!lockedOut && <SceneOverlay scene={scene} playing={!paused} />}
             {lockedOut && <UnlockPanel price={access?.price ?? null} />}
             {paused && !lockedOut && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -729,8 +742,9 @@ export default function PracticePage() {
             target={target}
           />
           </div>
-          {/* Audio Mixer + Keyboard Shortcuts, under the progress chart */}
+          {/* View + Audio Mixer + Keyboard Shortcuts, under the progress chart */}
           <div className="order-7 lg:mt-5">
+            <ScenePicker value={scene} onChange={pickScene} />
             <button
               onClick={toggleMixer}
               aria-expanded={mixerOpen}

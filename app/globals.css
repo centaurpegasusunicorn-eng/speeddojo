@@ -120,3 +120,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .belt-up, .belt-up * { animation-duration: 0.01s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
 }
+
+/* ── Placeholder scenes (components/SceneOverlay.tsx) ───────────────────── */
+@keyframes sceneSwim {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(65vw) translateY(-12px); }
+  100% { transform: translateX(130vw) translateY(0); }
+}
+@keyframes sceneRipple { 0%, 100% { opacity: 0.5; scale: 1; } 50% { opacity: 1; scale: 1.06; } }
+@keyframes sceneFlow { from { background-position: 0 0; } to { background-position: -100% 0; } }
