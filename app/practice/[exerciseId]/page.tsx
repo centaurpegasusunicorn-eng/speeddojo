@@ -36,6 +36,7 @@ import RepCue from "@/components/RepCue";
 import CommunityLink from "@/components/CommunityLink";
 import KeyboardShortcuts from "@/components/KeyboardShortcuts";
 import { BRAND } from "@/lib/brand";
+import { PROGRAM } from "@/lib/programs";
 import { PRICING, isFree } from "@/lib/pricing";
 import UnlockPanel from "@/components/UnlockPanel";
 
@@ -619,6 +620,9 @@ export default function PracticePage() {
       {/* Path (over the video) + Log-your-rep prompt (over the dial, only once the rep has finished) */}
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,calc((100%_-_2rem)*var(--right-col)/100))] gap-4 lg:gap-8 items-center mb-4" style={{ "--right-col": RIGHT_COLUMN_PERCENT } as React.CSSProperties}>
         <div>
+          <p className="mb-1 text-center sm:text-left text-[13px] font-semibold tracking-[0.3em] uppercase text-[#CC1010]">
+            {PROGRAM.name}
+          </p>
           {/* phones: a straight row that fits the screen; wider screens: the winding trail */}
           <div className="sm:hidden pt-2">
             <PathMenu exercises={EXERCISES} path={path} currentId={exercise.id} paidFrom={paidFrom} straight />

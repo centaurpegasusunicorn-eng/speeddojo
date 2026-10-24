@@ -7,6 +7,7 @@
  */
 
 import { BRAND } from "@/lib/brand";
+import { PROGRAM } from "@/lib/programs";
 
 export const CARD_W = 1080;
 export const CARD_H = 1350;
@@ -123,6 +124,14 @@ export async function drawBeltCard(info: CardInfo): Promise<HTMLCanvasElement> {
     ctx.fillRect(-8, -4, 16, 8);
     ctx.restore();
   }
+
+  // The program, across the top
+  ctx.textAlign = "center";
+  (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing = "12px";
+  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  ctx.font = 'bold 30px Arial, "Helvetica Neue", Helvetica, sans-serif';
+  ctx.fillText(PROGRAM.name.toUpperCase(), cx + 6, info.photo && info.day1 ? 92 : 74);
+  (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing = "0px";
 
   // The photo, framed in the belt's colour and gold
   const belt = await loadImage(svgDataUrl(beltSvg(info.beltColor, { light, black: isBlack })));

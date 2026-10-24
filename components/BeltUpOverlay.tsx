@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { BELTS, type Belt, type Rep } from "@/lib/belts";
 import { EXERCISES } from "@/lib/mockData";
 import { journeyLine } from "@/lib/journey";
+import { PROGRAM } from "@/lib/programs";
 import { Camera } from "lucide-react";
 import BeltPhoto from "@/components/BeltPhoto";
 
@@ -195,10 +196,10 @@ export default function BeltUpOverlay({
         <BeltKnot color={belt.color} light={lightBelt} black={isBlack} glow={glow} />
 
         <p
-          className="mt-6 sm:mt-8 text-[13px] sm:text-sm font-semibold tracking-[0.5em] uppercase"
+          className="mt-6 sm:mt-8 text-[12px] sm:text-sm font-semibold tracking-[0.25em] sm:tracking-[0.5em] uppercase text-center"
           style={{ color: GOLD, animation: "buRise 0.6s 1.1s ease-out both" }}
         >
-          {isBlack ? "Mastery" : "Belt earned"}
+          {PROGRAM.name} · {isBlack ? "Mastery" : "Belt earned"}
         </p>
         <h1
           className="mt-2 text-6xl sm:text-8xl md:text-9xl font-black tracking-tight text-center leading-none"
@@ -215,7 +216,7 @@ export default function BeltUpOverlay({
             style={{ animation: "buRise 0.6s 1.7s ease-out both" }}
           >
             {isBlack
-              ? "All 12 belts earned. The full path is complete."
+              ? `All 12 ${PROGRAM.name} belts earned. The path is complete.`
               : journey}
           </p>
         )}
@@ -287,7 +288,7 @@ export default function BeltUpOverlay({
           allBelts={BELTS}
           line={
             isBlack
-              ? "All 12 belts earned"
+              ? `All 12 ${PROGRAM.name} belts earned`
               : journey || `Belt ${index + 1} of ${total}`
           }
           onClose={() => setPhoto(false)}

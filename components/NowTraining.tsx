@@ -1,5 +1,6 @@
 "use client";
 
+import { PROGRAM } from "@/lib/programs";
 import {
   BELTS,
   REPS_TO_COMPLETE,
@@ -54,7 +55,7 @@ export default function NowTraining({
     <section className="mt-6 rounded-2xl bg-neutral-100 dark:bg-neutral-900 px-4 py-4 sm:px-6 sm:py-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="text-[16px] tracking-[0.2em] uppercase text-neutral-600 dark:text-neutral-400">
-          Now training · Exercise {index + 1}
+          {PROGRAM.name} · Exercise {index + 1}
         </p>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 w-full sm:w-auto">

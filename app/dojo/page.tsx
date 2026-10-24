@@ -19,6 +19,7 @@ import { localDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { isFree } from "@/lib/pricing";
+import { PROGRAM } from "@/lib/programs";
 
 /*
  * MY DOJO: everything personal in one place.
@@ -133,7 +134,8 @@ export default function MyDojoPage() {
         </div>
 
         {/* ── 2. My belts ─────────────────────────────────────────────── */}
-        <h2 className="mt-14 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">My belts</h2>
+        <p className="mt-14 text-[13px] font-semibold tracking-[0.3em] uppercase text-[#CC1010]">My belts</p>
+        <h2 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">{PROGRAM.name}</h2>
         <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {EXERCISES.map((ex, i) => {
             const belt = BELTS[Math.min(i, BELTS.length - 1)];
@@ -248,7 +250,7 @@ export default function MyDojoPage() {
           beltColor={BELTS[card].color}
           beltIndex={card}
           allBelts={BELTS}
-          line={card === BELTS.length - 1 ? "All 12 belts earned" : journeyLine(EXERCISES[card], all)}
+          line={card === BELTS.length - 1 ? `All 12 ${PROGRAM.name} belts earned` : journeyLine(EXERCISES[card], all)}
           onClose={() => setCard(null)}
         />
       )}

@@ -5,6 +5,7 @@ import { Camera, Download, RotateCcw, Share2, X, ImageUp } from "lucide-react";
 import { beltSvg, drawBeltCard, squareFrom, svgDataUrl, GOLD } from "@/lib/beltCard";
 import { BRAND } from "@/lib/brand";
 import { loadDay1 } from "@/lib/day1";
+import { PROGRAM } from "@/lib/programs";
 
 /*
  * "Take your belt photo": webcam selfie with the belt across it, turned into
@@ -132,7 +133,7 @@ export default function BeltPhoto(props: Props) {
         files: [file],
         title: `${beltName} Belt`,
         text: [
-          `Just earned my ${beltName} Belt on ${BRAND.name} 🥋🎸`,
+          `Just earned my ${beltName} Belt in ${PROGRAM.name} on ${BRAND.name} 🥋🎸`,
           props.line,
           [BRAND.hashtag, BRAND.instagram, BRAND.website].filter(Boolean).join(" "),
         ]
