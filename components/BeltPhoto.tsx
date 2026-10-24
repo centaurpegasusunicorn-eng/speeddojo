@@ -115,7 +115,13 @@ export default function BeltPhoto(props: Props) {
       await navigator.share({
         files: [file],
         title: `${beltName} Belt`,
-        text: `Just earned my ${beltName} Belt on ${BRAND.name} 🥋🎸`,
+        text: [
+          `Just earned my ${beltName} Belt on ${BRAND.name} 🥋🎸`,
+          props.line,
+          [BRAND.hashtag, BRAND.website].filter(Boolean).join(" "),
+        ]
+          .filter(Boolean)
+          .join("\n"),
       });
     } catch {
       /* they cancelled the share sheet */

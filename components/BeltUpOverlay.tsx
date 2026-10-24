@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BELTS, type Belt } from "@/lib/belts";
+import { BELTS, type Belt, type Rep } from "@/lib/belts";
 import { EXERCISES } from "@/lib/mockData";
 import { Camera } from "lucide-react";
 import BeltPhoto from "@/components/BeltPhoto";
@@ -24,15 +24,19 @@ const BELT_UP_SOUND = "";
 
 export default function BeltUpOverlay({
   belt,
+  reps = [],
   onDone,
 }: {
   belt: Belt;
+  /** the student's logged reps, for the "60 → 90 BPM in 12 days" line */
+  reps?: Rep[];
   onDone: () => void;
 }) {
   const index = Math.max(0, BELTS.findIndex((b) => b.name === belt.name));
   const total = BELTS.length;
   const isBlack = index === total - 1;
   const exercise = EXERCISES[index];
+  const journey = exercise ? journeyLine(exercise, reps) : "";
   const lightBelt = belt.name === "White" || belt.name === "Silver";
   const glow = belt.name === "Black" ? GOLD : belt.color;
 
@@ -211,7 +215,7 @@ export default function BeltUpOverlay({
           >
             {isBlack
               ? "All 12 belts earned. The full path is complete."
-              : `${exercise.name} mastered at ${exercise.endBpm} BPM`}
+              : journey}
           </p>
         )}
 
@@ -283,15 +287,28 @@ export default function BeltUpOverlay({
           line={
             isBlack
               ? "All 12 belts earned"
-              : exercise
-              ? `${exercise.name} mastered at ${exercise.endBpm} BPM`
-              : `Belt ${index + 1} of ${total}`
+              : journey || `Belt ${index + 1} of ${total}`
           }
           onClose={() => setPhoto(false)}
         />
       )}
     </div>
   );
+}
+
+/* The progress story: "Silent Step: 60 → 90 BPM in 12 days". Falls back to
+   "Silent Step mastered at 90 BPM" if they started at the target already. */
+function journeyLine(ex: { id: string; name: string; endBpm: number }, reps: Rep[]): string {
+  const mine = reps.filter((r) => r.exerciseId === ex.id);
+  if (mine.length === 0) return `${ex.name} mastered at ${ex.endBpm} BPM`;
+  const first = mine.reduce((a, b) => (b.createdAt < a.createdAt ? b : a));
+  const from = Math.min(...mine.filter((r) => r.createdAt === first.createdAt).map((r) => r.bpm));
+  if (from >= ex.endBpm) return `${ex.name} mastered at ${ex.endBpm} BPM`;
+  const start = new Date(first.createdAt + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.max(1, Math.round((today.getTime() - start.getTime()) / 86_400_000) + 1);
+  return `${ex.name}: ${from} → ${ex.endBpm} BPM in ${days} day${days === 1 ? "" : "s"}`;
 }
 
 /* A tied martial-arts belt: it slides in, the knot pops, the tails swing

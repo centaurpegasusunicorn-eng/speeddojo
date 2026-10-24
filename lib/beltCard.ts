@@ -176,7 +176,12 @@ export async function drawBeltCard(info: CardInfo): Promise<HTMLCanvasElement> {
 
   spaced(0);
   ctx.fillStyle = "rgba(255,255,255,0.75)";
-  ctx.font = `34px ${font}`;
+  let lineSize = 34;
+  ctx.font = `${lineSize}px ${font}`;
+  while (ctx.measureText(info.line).width > CARD_W - 100 && lineSize > 22) {
+    lineSize -= 2;
+    ctx.font = `${lineSize}px ${font}`;
+  }
   ctx.fillText(info.line, cx, 1208);
 
   // The 12-belt count
@@ -199,7 +204,8 @@ export async function drawBeltCard(info: CardInfo): Promise<HTMLCanvasElement> {
   spaced(12);
   ctx.fillStyle = "rgba(255,255,255,0.55)";
   ctx.font = `28px ${font}`;
-  ctx.fillText(BRAND.name.toUpperCase(), cx + 6, 1316);
+  // the website once it's set (lib/brand.ts), otherwise the name
+  ctx.fillText(BRAND.website ? BRAND.website.toUpperCase() : BRAND.name.toUpperCase(), cx + 6, 1316);
   spaced(0);
 
   return c;

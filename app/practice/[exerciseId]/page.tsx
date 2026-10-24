@@ -848,6 +848,7 @@ export default function PracticePage() {
       {beltUp && (
         <BeltUpOverlay
           belt={beltUp}
+          reps={reps}
           onDone={() => {
             // Just earned the last free belt? Go straight to the next one,
             // where the unlock offer sits in the video space
