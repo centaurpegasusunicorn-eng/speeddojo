@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, Download, RotateCcw, Share2, X, ImageUp } from "lucide-react";
 import { beltSvg, drawBeltCard, squareFrom, svgDataUrl, GOLD } from "@/lib/beltCard";
 import { BRAND } from "@/lib/brand";
+import { loadDay1 } from "@/lib/day1";
 
 /*
  * "Take your belt photo": webcam selfie with the belt across it, turned into
- * a shareable card. Nothing is uploaded; the photo stays on the device.
+ * a shareable card (with their private Day 1 photo alongside, if they have
+ * one). Today's photo is never uploaded; it stays on the device.
  */
 
 const COUNTDOWN_FROM = 3;
@@ -31,31 +33,45 @@ export default function BeltPhoto(props: Props) {
   const [flash, setFlash] = useState(false);
   const [card, setCard] = useState<{ url: string; blob: Blob } | null>(null);
   const [canShare, setCanShare] = useState(false);
+  const day1Ref = useRef<HTMLCanvasElement | null>(null);
+  useEffect(() => {
+    loadDay1()
+      .then((d) => (day1Ref.current = d?.photo ?? null))
+      .catch(() => {});
+  }, []);
 
   const light = beltName === "White" || beltName === "Silver";
   const isBlack = beltIndex === allBelts.length - 1;
   const beltImg = svgDataUrl(beltSvg(beltColor, { light, black: isBlack }));
   const fileName = `${BRAND.name.toLowerCase()}-${beltName.toLowerCase()}-belt.png`;
 
+  const attempt = useRef(0); // only the latest camera start counts
+
   const stopCamera = () => {
+    attempt.current++;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
   };
 
   const startCamera = async () => {
+    const mine = ++attempt.current;
     setStage("starting");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 1280 } },
         audio: false,
       });
+      if (mine !== attempt.current) {
+        stream.getTracks().forEach((t) => t.stop()); // a newer start took over
+        return;
+      }
       streamRef.current = stream;
       const v = videoRef.current!;
       v.srcObject = stream;
       await v.play();
-      setStage("camera");
+      if (mine === attempt.current) setStage("camera");
     } catch {
-      setStage("nocamera"); // no camera, or permission declined
+      if (mine === attempt.current) setStage("nocamera"); // no camera, or permission declined
     }
   };
 
@@ -71,7 +87,7 @@ export default function BeltPhoto(props: Props) {
 
   const makeCard = async (photo: HTMLCanvasElement | null) => {
     setStage("making");
-    const canvas = await drawBeltCard({ ...props, photo });
+    const canvas = await drawBeltCard({ ...props, photo, day1: day1Ref.current });
     const blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b!), "image/png"));
     const file = new File([blob], fileName, { type: "image/png" });
     setCanShare(!!navigator.canShare?.({ files: [file] }));

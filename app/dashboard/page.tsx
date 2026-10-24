@@ -6,6 +6,7 @@ import { EXERCISES } from "@/lib/mockData";
 import { loadReps } from "@/lib/repStore";
 import { pathState } from "@/lib/belts";
 import { createClient } from "@/lib/supabase/client";
+import { needsWelcome } from "@/lib/day1";
 
 /*
  * There's no separate dashboard any more: the practice screen shows
@@ -43,6 +44,12 @@ export default function DashboardRedirect() {
           .limit(1)
           .maybeSingle(),
       ]);
+      // Brand-new students start with the welcome (intro video + Day 1 photo)
+      if (!rep.data && !time.data && (await needsWelcome())) {
+        router.replace("/welcome");
+        return;
+      }
+
       const latest = [rep.data, time.data]
         .filter((r): r is { exercise_id: string; created_at: string } => !!r)
         .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];

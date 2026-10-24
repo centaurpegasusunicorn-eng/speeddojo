@@ -67,6 +67,8 @@ export type CardInfo = {
   allBelts: { name: string; color: string }[];
   line: string; // e.g. "Silent Step mastered at 90 BPM"
   photo: HTMLCanvasElement | null; // square, already mirrored
+  /** their Day 1 photo, shown next to today's when there is one */
+  day1?: HTMLCanvasElement | null;
 };
 
 /** Draws the card and returns it as a canvas */
@@ -124,7 +126,40 @@ export async function drawBeltCard(info: CardInfo): Promise<HTMLCanvasElement> {
 
   // The photo, framed in the belt's colour and gold
   const belt = await loadImage(svgDataUrl(beltSvg(info.beltColor, { light, black: isBlack })));
-  if (info.photo) {
+  if (info.photo && info.day1) {
+    // Day 1 and Today side by side, the belt tying them together
+    const s = 440, y = 225, r = 40;
+    const spots = [
+      { x: cx - 20 - s, img: info.day1, label: "DAY 1", fade: true },
+      { x: cx + 20, img: info.photo, label: "TODAY", fade: false },
+    ];
+    for (const p of spots) {
+      ctx.save();
+      ctx.shadowColor = withAlpha(glow, 0.7);
+      ctx.shadowBlur = 40;
+      roundRect(ctx, p.x - 11, y - 11, s + 22, s + 22, r + 9);
+      ctx.fillStyle = GOLD;
+      ctx.fill();
+      ctx.restore();
+      roundRect(ctx, p.x - 5, y - 5, s + 10, s + 10, r + 4);
+      ctx.fillStyle = info.beltColor;
+      ctx.fill();
+      ctx.save();
+      roundRect(ctx, p.x, y, s, s, r);
+      ctx.clip();
+      if (p.fade) ctx.filter = "grayscale(0.7) contrast(0.95)";
+      ctx.drawImage(p.img, p.x, y, s, s);
+      ctx.restore();
+      ctx.filter = "none";
+      (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing = "10px";
+      ctx.textAlign = "center";
+      ctx.fillStyle = p.fade ? "rgba(255,255,255,0.7)" : GOLD;
+      ctx.font = 'bold 30px Arial, "Helvetica Neue", Helvetica, sans-serif';
+      ctx.fillText(p.label, p.x + s / 2 + 5, y - 32);
+    }
+    (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing = "0px";
+    ctx.drawImage(belt, cx - 495, 460, 990, 495);
+  } else if (info.photo) {
     const s = 640, x = cx - s / 2, y = 110, r = 56;
     ctx.save();
     ctx.shadowColor = withAlpha(glow, 0.8);

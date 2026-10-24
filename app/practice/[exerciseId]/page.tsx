@@ -821,16 +821,16 @@ export default function PracticePage() {
           <div className="order-6 -mt-6 lg:mt-0">
             <CommunityLink />
           </div>
-          {access?.paywall && (
-            <div className="order-9 lg:mt-4">
-              <Link
-                href="/unlock"
-                className="text-[15px] text-neutral-500 dark:text-neutral-400 hover:underline"
-              >
+          <div className="order-9 lg:mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[15px] text-neutral-500 dark:text-neutral-400">
+            <Link href="/welcome" className="hover:underline">
+              Welcome video and Day 1 photo
+            </Link>
+            {access?.paywall && (
+              <Link href="/unlock" className="hover:underline">
                 {access.member ? "Membership and billing" : "Unlock all 12 belts"}
               </Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
       {debug && (

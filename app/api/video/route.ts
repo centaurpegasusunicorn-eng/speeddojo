@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/access";
 import { isFree } from "@/lib/pricing";
 import { EXERCISES } from "@/lib/mockData";
+import { WELCOME } from "@/lib/welcome";
 
 /*
  * Hands the video player a short-lived link to a video.
@@ -77,6 +78,7 @@ async function canWatch(file: string): Promise<boolean> {
     e.guideVideoUrl,
     e.guideVideoUrlDark,
   ]);
+  freeFiles.push(WELCOME.INTRO_VIDEO_URL, WELCOME.INTRO_VIDEO_URL_DARK);
   if (freeFiles.includes(name)) return true;
   return (await getAccess()).member;
 }
