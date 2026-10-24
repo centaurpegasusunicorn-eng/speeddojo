@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BELTS, type Belt, type Rep } from "@/lib/belts";
 import { EXERCISES } from "@/lib/mockData";
+import { journeyLine } from "@/lib/journey";
 import { Camera } from "lucide-react";
 import BeltPhoto from "@/components/BeltPhoto";
 
@@ -294,21 +295,6 @@ export default function BeltUpOverlay({
       )}
     </div>
   );
-}
-
-/* The progress story: "Silent Step: 60 → 90 BPM in 12 days". Falls back to
-   "Silent Step mastered at 90 BPM" if they started at the target already. */
-function journeyLine(ex: { id: string; name: string; endBpm: number }, reps: Rep[]): string {
-  const mine = reps.filter((r) => r.exerciseId === ex.id);
-  if (mine.length === 0) return `${ex.name} mastered at ${ex.endBpm} BPM`;
-  const first = mine.reduce((a, b) => (b.createdAt < a.createdAt ? b : a));
-  const from = Math.min(...mine.filter((r) => r.createdAt === first.createdAt).map((r) => r.bpm));
-  if (from >= ex.endBpm) return `${ex.name} mastered at ${ex.endBpm} BPM`;
-  const start = new Date(first.createdAt + "T00:00:00");
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const days = Math.max(1, Math.round((today.getTime() - start.getTime()) / 86_400_000) + 1);
-  return `${ex.name}: ${from} → ${ex.endBpm} BPM in ${days} day${days === 1 ? "" : "s"}`;
 }
 
 /* A tied martial-arts belt: it slides in, the knot pops, the tails swing

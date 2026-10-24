@@ -5,8 +5,15 @@ import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-/** Round icon button that signs the student out and returns to /login. */
-export default function SignOutButton({ className = "" }: { className?: string }) {
+/** Signs the student out and returns to /login. A round icon by default;
+ *  withLabel shows "Sign out" next to the icon. */
+export default function SignOutButton({
+  className = "",
+  withLabel = false,
+}: {
+  className?: string;
+  withLabel?: boolean;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
@@ -15,6 +22,19 @@ export default function SignOutButton({ className = "" }: { className?: string }
     await createClient().auth.signOut();
     router.push("/login");
     router.refresh();
+  }
+
+  if (withLabel) {
+    return (
+      <button
+        type="button"
+        onClick={signOut}
+        disabled={busy}
+        className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[15px] font-semibold border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition disabled:opacity-50 ${className}`}
+      >
+        <LogOut size={16} aria-hidden /> Sign out
+      </button>
+    );
   }
 
   return (

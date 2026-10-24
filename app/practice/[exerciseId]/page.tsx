@@ -31,7 +31,7 @@ import { readPrefs, writePrefs } from "@/lib/prefs";
 import { lastTempo, saveLastTempo } from "@/lib/lastTempo";
 import { useTheme } from "@/lib/theme";
 import ThemeToggle from "@/components/ThemeToggle";
-import SignOutButton from "@/components/SignOutButton";
+import ProfileButton from "@/components/ProfileButton";
 import RepCue from "@/components/RepCue";
 import CommunityLink from "@/components/CommunityLink";
 import KeyboardShortcuts from "@/components/KeyboardShortcuts";
@@ -579,7 +579,7 @@ export default function PracticePage() {
 
         <div className="order-2 h-14 flex items-center gap-1 lg:hidden">
           <ThemeToggle />
-          <SignOutButton />
+          <ProfileButton className="ml-1" />
         </div>
 
         <div className="order-3 w-full lg:order-2 lg:w-auto min-w-0 flex items-start gap-3">
@@ -603,14 +603,14 @@ export default function PracticePage() {
             style={{ backgroundColor: stripColor }}
           />
           <div className="h-16 lg:h-20 min-w-0 flex-1 flex items-center gap-2 lg:gap-4 overflow-x-auto [scrollbar-width:none] lg:overflow-visible">
-            <span className="shrink-0 whitespace-nowrap text-base lg:text-lg text-neutral-700 dark:text-neutral-300 mr-1 lg:mr-2">{stripLabel}</span>
+            <Link href="/dojo" title="My belts" className="shrink-0 whitespace-nowrap text-base lg:text-lg text-neutral-700 dark:text-neutral-300 hover:underline mr-1 lg:mr-2">{stripLabel}</Link>
             <StatPill label="Personal best" value={`${personalBest || "—"} bpm`} />
             <StatPill label="Clean rate" value={`${cleanRate}%`} />
             <StatPill label="Streak" value={`${streak} days`} />
             <StatPill label="Practised today" value={formatDuration(todaySeconds)} />
             <span className="hidden lg:contents">
               <ThemeToggle className="ml-2" />
-              <SignOutButton className="-ml-2" />
+              <ProfileButton className="ml-1" />
             </span>
           </div>
         </div>
