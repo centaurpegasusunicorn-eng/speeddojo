@@ -7,4 +7,7 @@ export const BRAND = {
   tagline: "Structured, BPM-tracked guitar practice.", // tab/search description
   hashtag: "#SpeedDojo", // added when students share their belt card
   website: "", // e.g. "speeddojo.com" once you have the domain: shown on the belt card
+  // Your Instagram handle, e.g. "@speeddojo": shown on belt cards and the share
+  // screen so students tag you. Leave "" to hide it.
+  instagram: "",
 };

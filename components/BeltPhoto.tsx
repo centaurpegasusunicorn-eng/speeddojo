@@ -134,7 +134,7 @@ export default function BeltPhoto(props: Props) {
         text: [
           `Just earned my ${beltName} Belt on ${BRAND.name} 🥋🎸`,
           props.line,
-          [BRAND.hashtag, BRAND.website].filter(Boolean).join(" "),
+          [BRAND.hashtag, BRAND.instagram, BRAND.website].filter(Boolean).join(" "),
         ]
           .filter(Boolean)
           .join("\n"),
@@ -272,6 +272,12 @@ export default function BeltPhoto(props: Props) {
               <RotateCcw size={18} /> Retake
             </button>
           </div>
+          {BRAND.instagram && (
+            <p className="mt-4 text-center text-[15px] text-white/80">
+              Post it and tag <span className="font-bold" style={{ color: GOLD }}>{BRAND.instagram}</span>, and
+              we&apos;ll share you on our page
+            </p>
+          )}
         </div>
       )}
     </div>

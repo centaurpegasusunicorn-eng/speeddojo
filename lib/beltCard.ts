@@ -239,8 +239,31 @@ export async function drawBeltCard(info: CardInfo): Promise<HTMLCanvasElement> {
   spaced(12);
   ctx.fillStyle = "rgba(255,255,255,0.55)";
   ctx.font = `28px ${font}`;
-  // the website once it's set (lib/brand.ts), otherwise the name
-  ctx.fillText(BRAND.website ? BRAND.website.toUpperCase() : BRAND.name.toUpperCase(), cx + 6, 1316);
+  // the website once it's set (lib/brand.ts), otherwise the name; plus your
+  // Instagram handle so people know who to tag
+  const name = BRAND.website ? BRAND.website.toUpperCase() : BRAND.name.toUpperCase();
+  const handle = BRAND.instagram ? (BRAND.instagram.startsWith("@") ? BRAND.instagram : "@" + BRAND.instagram) : "";
+  if (!handle) {
+    ctx.fillText(name, cx + 6, 1316);
+  } else {
+    // name (spaced out) · @handle (normal spacing, so it's easy to read)
+    ctx.textAlign = "left";
+    const nameW = ctx.measureText(name).width;
+    spaced(0);
+    ctx.font = `bold 30px ${font}`;
+    const handleW = ctx.measureText(handle).width;
+    const gap = 46;
+    const x0 = cx - (nameW + gap + handleW) / 2;
+    spaced(12);
+    ctx.font = `28px ${font}`;
+    ctx.fillText(name, x0, 1316);
+    spaced(0);
+    ctx.fillText("·", x0 + nameW + gap / 2 - 5, 1316);
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.font = `bold 30px ${font}`;
+    ctx.fillText(handle, x0 + nameW + gap, 1316);
+    ctx.textAlign = "center";
+  }
   spaced(0);
 
   return c;
