@@ -2,16 +2,14 @@
 
 import { useId, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 /*
- * Create-an-account form that sits right on the homepage (no trip to
- * /login). Same sign-up as the login page: if email confirmation is on, it
- * says to check their inbox; otherwise it goes straight in.
- *   next: where to go after (default /dashboard, which sends new students
- *         to the welcome)
- *   row:  email, password and button side by side on wider screens
+ * Sign-up on the homepage: just an email. We send a link that signs them
+ * straight in (no password needed; they can set one later in My Dojo).
+ *   next: where the link takes them (default /dashboard, which sends new
+ *         students to the welcome)
+ *   row:  email and button side by side on wider screens
  */
 export default function SignUpForm({
   next = "/dashboard",
@@ -19,6 +17,7 @@ export default function SignUpForm({
   cta = "Start free",
   autoFocus = false,
   dark = false,
+  placeholder = "Your email",
 }: {
   next?: string;
   row?: boolean;
@@ -26,11 +25,10 @@ export default function SignUpForm({
   autoFocus?: boolean;
   /** white-on-dark styling, for dark sections */
   dark?: boolean;
+  placeholder?: string;
 }) {
-  const router = useRouter();
   const uid = useId(); // unique field ids, so several forms can share a page
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
@@ -40,16 +38,16 @@ export default function SignUpForm({
     setError(null);
     setLoading(true);
     const origin = window.location.origin;
-    const { data, error } = await createClient().auth.signUp({
+    const { error } = await createClient().auth.signInWithOtp({
       email,
-      password,
-      options: { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
     });
     setLoading(false);
     if (error) return setError(error.message);
-    if (!data.session) return setSent(true); // they confirm by email first
-    router.push(next);
-    router.refresh();
+    setSent(true);
   }
 
   if (sent) {
@@ -57,7 +55,7 @@ export default function SignUpForm({
       <div className={`rounded-xl px-5 py-4 text-left ${dark ? "bg-white/10" : "bg-neutral-100 dark:bg-neutral-900"}`} role="status">
         <p className="text-lg font-semibold">Check your email</p>
         <p className={`mt-1 text-[15px] ${dark ? "text-white/70" : "text-neutral-600 dark:text-neutral-400"}`}>
-          We&apos;ve sent a link to {email}. Click it to confirm your account and you&apos;ll go straight in.
+          We&apos;ve sent a link to {email}. Open it on this device and you&apos;ll go straight in.
         </p>
       </div>
     );
@@ -78,22 +76,10 @@ export default function SignUpForm({
           type="email"
           required
           autoComplete="email"
-          placeholder="Email"
+          placeholder={placeholder}
           autoFocus={autoFocus}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className={field}
-        />
-        <label className="sr-only" htmlFor={`${uid}-pass`}>Password</label>
-        <input
-          id={`${uid}-pass`}
-          type="password"
-          required
-          minLength={6}
-          autoComplete="new-password"
-          placeholder="Choose a password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           className={field}
         />
         <button
@@ -101,7 +87,7 @@ export default function SignUpForm({
           disabled={loading}
           className="shrink-0 rounded-xl px-7 py-3.5 text-lg font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] active:scale-[0.98] transition disabled:opacity-60"
         >
-          {loading ? "Creating…" : cta}
+          {loading ? "Sending…" : cta}
         </button>
       </div>
       {error && <p className="mt-2 text-[15px] text-[#E5484D] text-left">{error}</p>}

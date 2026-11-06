@@ -7,6 +7,7 @@ import { loadReps } from "@/lib/repStore";
 import { pathState } from "@/lib/belts";
 import { createClient } from "@/lib/supabase/client";
 import { needsWelcome } from "@/lib/day1";
+import { importDemoReps } from "@/lib/demoReps";
 
 /*
  * There's no separate dashboard any more: the practice screen shows
@@ -44,8 +45,12 @@ export default function DashboardRedirect() {
           .limit(1)
           .maybeSingle(),
       ]);
+      // Reps they logged in the homepage demo before signing up
+      const fresh = !rep.data && !time.data;
+      await importDemoReps();
+
       // Brand-new students start with the welcome (intro video + Day 1 photo)
-      if (!rep.data && !time.data && (await needsWelcome())) {
+      if (fresh && (await needsWelcome())) {
         router.replace("/welcome");
         return;
       }

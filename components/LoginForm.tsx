@@ -38,6 +38,24 @@ export default function LoginForm() {
     setNotice(null);
   }
 
+  // No password (they signed up with just an email): send a sign-in link
+  async function sendLink() {
+    if (!email) return setError("Enter your email first, then we'll send the link.");
+    setError(null);
+    setNotice(null);
+    setLoading(true);
+    const { error } = await createClient().auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    });
+    setLoading(false);
+    if (error) return setError(error.message);
+    setNotice("Check your email for a sign-in link.");
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const supabase = createClient();
@@ -121,13 +139,22 @@ export default function LoginForm() {
         )}
 
         {mode === "signin" && (
-          <button
-            type="button"
-            onClick={() => switchMode("forgot")}
-            className="text-sm text-neutral-500 dark:text-neutral-400 underline"
-          >
-            Forgot password?
-          </button>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            <button
+              type="button"
+              onClick={sendLink}
+              className="text-sm text-neutral-500 dark:text-neutral-400 underline"
+            >
+              Email me a sign-in link
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode("forgot")}
+              className="text-sm text-neutral-500 dark:text-neutral-400 underline"
+            >
+              Forgot password?
+            </button>
+          </div>
         )}
 
         {error && (

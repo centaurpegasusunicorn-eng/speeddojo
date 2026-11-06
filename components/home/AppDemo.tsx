@@ -10,7 +10,9 @@ import SignUpForm from "@/components/home/SignUpForm";
 import GuideVideo from "@/components/GuideVideo";
 import { ClickEngine } from "@/lib/clickEngine";
 import { useTheme } from "@/lib/theme";
-import { BELTS, REPS_TO_COMPLETE, pathState } from "@/lib/belts";
+import { BELTS, REPS_TO_COMPLETE, pathState, type Rep } from "@/lib/belts";
+import { loadDemoReps, saveDemoRep, type DemoRep } from "@/lib/demoReps";
+import { localDay } from "@/lib/dates";
 import { EXERCISES } from "@/lib/mockData";
 import { PROGRAM } from "@/lib/programs";
 
@@ -32,7 +34,24 @@ export default function AppDemo() {
   const [bpm, setBpm] = useState(EX.startBpm);
   const [playing, setPlaying] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [showForm, setShowForm] = useState(false); // sign-up opened from "Log it free"
+  // reps logged in the demo: kept in this browser, saved to their account
+  // when they sign up (lib/demoReps.ts)
+  const [demo, setDemo] = useState<DemoRep[]>([]);
+  const [answered, setAnswered] = useState(false);
+  const [playedSec, setPlayedSec] = useState(0);
+  useEffect(() => setDemo(loadDemoReps()), []);
+  useEffect(() => {
+    if (!playing) return;
+    const t = setInterval(() => setPlayedSec((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [playing]);
+  const log = (clean: boolean) => {
+    setDemo(saveDemoRep({ exerciseId: EX.id, bpm, clean }));
+    setAnswered(true);
+  };
+  const today = localDay(new Date());
+  const chartReps: Rep[] = demo.map((r, i) => ({ id: `d${i}`, exerciseId: r.exerciseId, bpm: r.bpm, clean: r.clean, createdAt: today }));
+  const cleanAtTarget = demo.filter((r) => r.clean && r.bpm >= EX.endBpm).length;
   const name = dark ? "white-dark" : "white";
   const path = useMemo(() => pathState(EXERCISES, []), []);
 
@@ -58,6 +77,7 @@ export default function AppDemo() {
     if (finished) {
       v.currentTime = 0;
       setFinished(false);
+      setAnswered(false);
     }
     if (v.paused) v.play().catch(() => {});
     else v.pause();
@@ -135,32 +155,38 @@ export default function AppDemo() {
             {finished && (
               <div className="mt-4 lg:mt-0 lg:absolute lg:inset-0 lg:rounded-xl lg:bg-black/45 lg:backdrop-blur-[2px] flex items-center justify-center lg:p-6">
                 <div className="w-full max-w-md rounded-xl bg-neutral-100 dark:bg-neutral-900 lg:bg-white lg:dark:bg-neutral-950 lg:shadow-2xl px-5 py-4" style={{ animation: "buRise 0.4s ease-out both" }}>
-                  <p className="text-lg font-bold">Was that rep clean?</p>
-                  <p className="mt-0.5 text-[15px] text-neutral-600 dark:text-neutral-400">
-                    Make a free account to log it and start earning your White belt.
-                  </p>
-                  <div className="mt-3 flex flex-wrap items-center gap-3">
-                    {!showForm && (
-                      <button
-                        type="button"
-                        onClick={() => setShowForm(true)}
-                        className="rounded-lg px-5 py-2.5 text-[15px] font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] transition"
-                      >
-                        Log it free
-                      </button>
-                    )}
-                    <button type="button" onClick={toggle} className="inline-flex items-center gap-1.5 text-[15px] text-neutral-600 dark:text-neutral-400 hover:underline">
-                      <RotateCcw size={15} aria-hidden /> Play again
-                    </button>
-                  </div>
-                  {/* the sign-up form slides open right here */}
-                  <div className={`grid transition-[grid-template-rows] duration-300 ${showForm ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-                    <div className="min-h-0 overflow-hidden" inert={!showForm}>
-                      <div className="pt-4">
-                        {showForm && <SignUpForm cta="Create free account" autoFocus />}
+                  {!answered ? (
+                    <>
+                      <p className="text-lg font-bold">Was that rep clean?</p>
+                      <p className="mt-0.5 text-[15px] text-neutral-600 dark:text-neutral-400">
+                        Only clean reps count towards the belt.
+                      </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-3">
+                        <button type="button" onClick={() => log(true)} className="rounded-lg px-6 py-2.5 text-[15px] font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] transition">
+                          Yes
+                        </button>
+                        <button type="button" onClick={() => log(false)} className="rounded-lg px-6 py-2.5 text-[15px] font-bold border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition">
+                          No
+                        </button>
+                        <button type="button" onClick={toggle} className="inline-flex items-center gap-1.5 text-[15px] text-neutral-600 dark:text-neutral-400 hover:underline">
+                          <RotateCcw size={15} aria-hidden /> Play again
+                        </button>
                       </div>
+                    </>
+                  ) : (
+                    <div style={{ animation: "buRise 0.35s ease-out both" }}>
+                      <p className="text-lg font-bold">That&apos;s on your chart</p>
+                      <p className="mt-0.5 text-[15px] text-neutral-600 dark:text-neutral-400">
+                        Enter your email to save it and start earning your White belt.
+                      </p>
+                      <div className="mt-3">
+                        <SignUpForm cta="Save my progress" autoFocus />
+                      </div>
+                      <button type="button" onClick={toggle} className="mt-1 inline-flex items-center gap-1.5 text-[15px] text-neutral-600 dark:text-neutral-400 hover:underline">
+                        <RotateCcw size={15} aria-hidden /> Play another rep
+                      </button>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}
@@ -196,10 +222,19 @@ export default function AppDemo() {
             Drag the dial to set your tempo.
           </p>
           <ProgressChart
-            reps={[]}
-            sessions={[]}
-            target={null}
+            reps={chartReps}
+            sessions={playedSec > 0 ? [{ day: today, seconds: playedSec }] : []}
+            target={
+              chartReps.length > 0
+                ? { name: BELT.name, tempo: EX.endBpm, progress: cleanAtTarget, needed: REPS_TO_COMPLETE }
+                : null
+            }
           />
+          {chartReps.length > 0 && (
+            <p className="mt-2 text-[13px] text-neutral-500 dark:text-neutral-400">
+              Saved in this browser until you enter your email.
+            </p>
+          )}
         </div>
       </div>
     </div>

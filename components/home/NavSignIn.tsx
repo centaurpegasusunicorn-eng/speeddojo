@@ -18,6 +18,7 @@ export default function NavSignIn({ label = "Sign in" }: { label?: string }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -27,6 +28,27 @@ export default function NavSignIn({ label = "Sign in" }: { label?: string }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  // For students who signed up with just an email: send a sign-in link
+  async function sendLink() {
+    if (!email) {
+      setError("Enter your email first.");
+      emailRef.current?.focus();
+      return;
+    }
+    setError(null);
+    setLoading(true);
+    const { error } = await createClient().auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+      },
+    });
+    setLoading(false);
+    if (error) return setError(error.message);
+    setNotice("Check your email for a sign-in link.");
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -100,6 +122,13 @@ export default function NavSignIn({ label = "Sign in" }: { label?: string }) {
           </div>
           <div className="mt-2 lg:mt-0 lg:absolute lg:translate-y-1.5 flex gap-4 text-[13px] text-neutral-500 dark:text-neutral-400">
             {error && <span className="text-[#E5484D]">{error}</span>}
+            {notice ? (
+              <span className="text-green-700 dark:text-green-400">{notice}</span>
+            ) : (
+              <button type="button" onClick={sendLink} className="hover:underline">
+                Email me a sign-in link
+              </button>
+            )}
             <Link href="/login?mode=forgot" className="hover:underline">
               Forgot password?
             </Link>

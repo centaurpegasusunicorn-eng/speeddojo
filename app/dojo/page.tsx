@@ -224,7 +224,7 @@ export default function MyDojoPage() {
             value="••••••••"
             action={
               <Link href="/reset-password" className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-neutral-700 dark:text-neutral-300 hover:underline">
-                <KeyRound size={16} aria-hidden /> Change
+                <KeyRound size={16} aria-hidden /> Set or change
               </Link>
             }
           />
