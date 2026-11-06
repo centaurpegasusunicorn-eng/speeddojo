@@ -109,6 +109,10 @@ export const HOME = {
         "Your free-belt progress carries straight over",
       ],
       cta: "Get the full dojo",
+      // the pop-up form behind that button
+      formTitle: "Create your account",
+      formBody: "Then you'll go straight to secure checkout to unlock all 12 belts.",
+      formCta: "Continue to checkout",
     },
     oneOffNote: "One payment for a year of access.",
     recurringNote: "Renews yearly. Cancel in a couple of clicks.",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import SignUpForm from "@/components/home/SignUpForm";
 import { Pause, Play } from "lucide-react";
 import BpmGauge from "@/components/BpmGauge";
 import { ClickEngine } from "@/lib/clickEngine";
@@ -31,14 +31,12 @@ export default function DialHero({
   headline,
   body,
   primary,
-  primaryHref,
   note,
   hint,
 }: {
   headline: string;
   body: string;
   primary: string;
-  primaryHref: string;
   note: string;
   hint: string;
 }) {
@@ -82,30 +80,28 @@ export default function DialHero({
         <p className="mt-4 text-lg sm:text-xl leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-[44rem]">
           {body}
         </p>
-        <div className="mt-6 flex flex-wrap justify-center items-center gap-3">
-          <Link
-            href={primaryHref}
-            className="rounded-xl px-7 py-4 text-lg font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] active:scale-[0.98] transition"
-          >
-            {primary}
-          </Link>
-          <button
-            type="button"
-            onClick={toggle}
-            className="inline-flex items-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition"
-          >
-            {playing ? <Pause size={18} aria-hidden /> : <Play size={18} aria-hidden />}
-            {playing ? "Pause" : "Play with click"}
-          </button>
+        {/* sign up right here, no trip to another page */}
+        <div id="start" className="mt-6 w-full max-w-2xl">
+          <SignUpForm row cta={primary} />
         </div>
-        <p className="mt-3 text-[15px] text-neutral-500 dark:text-neutral-400">{note}</p>
+        <p className="mt-1 text-[15px] text-neutral-500 dark:text-neutral-400">{note}</p>
       </div>
 
       {/* the dial: its centre sits on the fold */}
       <div className="relative mx-auto" style={{ width: DIAL, marginTop: `calc(${DIAL} * -${TUCK})` }}>
         <BpmGauge bpm={bpm} min={MIN} max={MAX} onChange={setBpm} videoRef={videoRef} large />
       </div>
-      <p className="mt-2 text-center text-[15px] text-neutral-500 dark:text-neutral-400">{hint}</p>
+      <div className="mt-3 flex flex-col items-center gap-2">
+        <button
+          type="button"
+          onClick={toggle}
+          className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[16px] font-semibold bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 hover:opacity-90 transition"
+        >
+          {playing ? <Pause size={18} aria-hidden /> : <Play size={18} aria-hidden />}
+          {playing ? "Pause" : "Play with click"}
+        </button>
+        <p className="text-center text-[15px] text-neutral-500 dark:text-neutral-400">{hint}</p>
+      </div>
 
       {/* the highway the dial is driving */}
       <div className="max-w-5xl mx-auto mt-10">

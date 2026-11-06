@@ -9,6 +9,8 @@ import BeltBand from "@/components/home/BeltBand";
 import HeroFull from "@/components/home/HeroFull";
 import TryIt from "@/components/home/TryIt";
 import DialHero from "@/components/home/DialHero";
+import SignUpForm from "@/components/home/SignUpForm";
+import SignUpButton from "@/components/home/SignUpButton";
 import { createClient } from "@/lib/supabase/server";
 import { priceLabel } from "@/lib/stripe";
 import { PRICING } from "@/lib/pricing";
@@ -26,7 +28,6 @@ export const metadata: Metadata = {
 };
 
 const SIGN_UP = "/login?mode=signup";
-const SIGN_UP_THEN_BUY = "/login?mode=signup&next=/unlock";
 
 type HeroLayout = "dial" | "try" | "split" | "bottom" | "center";
 const LAYOUTS: HeroLayout[] = ["dial", "try", "split", "bottom", "center"];
@@ -54,12 +55,10 @@ export default async function Home({
   const ctas = (
     <>
       <div className="mt-8 flex flex-wrap items-center gap-3">
-        <Link
-          href={SIGN_UP}
+        <SignUpButton
+          label={h.hero.primary}
           className="rounded-xl px-7 py-4 text-lg font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] active:scale-[0.98] transition"
-        >
-          {h.hero.primary}
-        </Link>
+        />
         <a href="#pricing" className="rounded-xl px-6 py-4 text-lg font-semibold border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition">
           {h.hero.secondary}
         </a>
@@ -84,12 +83,10 @@ export default async function Home({
           <Link href="/login" className="px-2 text-[15px] font-medium hover:underline">
             {h.nav.signIn}
           </Link>
-          <Link
-            href={SIGN_UP}
+          <SignUpButton
+            label={h.nav.start}
             className="rounded-lg px-4 py-2.5 text-[15px] font-semibold bg-[#CC1010] text-white hover:bg-[#B00D0D] transition"
-          >
-            {h.nav.start}
-          </Link>
+          />
         </nav>
       </header>
 
@@ -99,7 +96,6 @@ export default async function Home({
             headline={h.hero.headline}
             body={h.hero.body}
             primary={h.hero.primary}
-            primaryHref={SIGN_UP}
             note={h.hero.note}
             hint={h.hero.dialHint}
           />
@@ -272,8 +268,12 @@ export default async function Home({
               name={h.pricing.free.name}
               price={h.pricing.free.price}
               points={h.pricing.free.points}
-              cta={h.pricing.free.cta}
-              href={SIGN_UP}
+              action={
+                <SignUpButton
+                  label={h.pricing.free.cta}
+                  className="mt-8 w-full rounded-xl px-6 py-3.5 text-center text-lg font-bold transition active:scale-[0.98] border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900"
+                />
+              }
               stripe="#FFFFFF"
             />
             <Plan
@@ -281,8 +281,16 @@ export default async function Home({
               price={price?.text ?? PRICING.priceFallback}
               note={price ? (price.recurring ? h.pricing.recurringNote : h.pricing.oneOffNote) : undefined}
               points={h.pricing.full.points}
-              cta={h.pricing.full.cta}
-              href={SIGN_UP_THEN_BUY}
+              action={
+                <SignUpButton
+                  label={h.pricing.full.cta}
+                  next="/unlock"
+                  title={h.pricing.full.formTitle}
+                  body={h.pricing.full.formBody}
+                  cta={h.pricing.full.formCta}
+                  className="mt-8 w-full rounded-xl px-6 py-3.5 text-center text-lg font-bold transition active:scale-[0.98] bg-[#CC1010] text-white hover:bg-[#B00D0D]"
+                />
+              }
               stripe="#111111"
               featured
             />
@@ -311,12 +319,9 @@ export default async function Home({
         <section className="px-4 sm:px-8 max-w-7xl mx-auto py-24 sm:py-32 text-center">
           <h2 className="wide text-4xl sm:text-6xl font-extrabold tracking-[-0.02em]">{h.final.heading}</h2>
           <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">{h.final.body}</p>
-          <Link
-            href={SIGN_UP}
-            className="mt-8 inline-block rounded-xl px-8 py-4 text-lg font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] active:scale-[0.98] transition shadow-[0_8px_24px_rgba(204,16,16,0.3)]"
-          >
-            {h.final.cta}
-          </Link>
+          <div className="mt-8 max-w-md mx-auto text-left">
+            <SignUpForm cta={h.final.cta} />
+          </div>
         </section>
       </main>
 
@@ -345,8 +350,7 @@ function Plan({
   price,
   note,
   points,
-  cta,
-  href,
+  action,
   stripe,
   featured = false,
 }: {
@@ -354,8 +358,7 @@ function Plan({
   price: string;
   note?: string;
   points: string[];
-  cta: string;
-  href: string;
+  action: React.ReactNode;
   stripe: string;
   featured?: boolean;
 }) {
@@ -384,16 +387,7 @@ function Plan({
           </li>
         ))}
       </ul>
-      <Link
-        href={href}
-        className={`mt-8 rounded-xl px-6 py-3.5 text-center text-lg font-bold transition active:scale-[0.98] ${
-          featured
-            ? "bg-[#CC1010] text-white hover:bg-[#B00D0D]"
-            : "border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900"
-        }`}
-      >
-        {cta}
-      </Link>
+      {action}
     </div>
   );
 }
