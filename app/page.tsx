@@ -11,6 +11,7 @@ import TryIt from "@/components/home/TryIt";
 import DialHero from "@/components/home/DialHero";
 import SignUpForm from "@/components/home/SignUpForm";
 import SignUpButton from "@/components/home/SignUpButton";
+import NavSignIn from "@/components/home/NavSignIn";
 import { createClient } from "@/lib/supabase/server";
 import { priceLabel } from "@/lib/stripe";
 import { PRICING } from "@/lib/pricing";
@@ -74,15 +75,13 @@ export default async function Home({
       ) : (
       <>
       {/* ── nav ── */}
-      <header className="px-4 sm:px-8 h-20 flex items-center justify-between max-w-7xl mx-auto">
+      <header className="relative px-4 sm:px-8 h-20 flex items-center justify-between max-w-7xl mx-auto">
         <span className="text-lg sm:text-xl tracking-[0.3em] font-light text-neutral-800 dark:text-neutral-200">
           {BRAND.name.toUpperCase()}
         </span>
         <nav className="flex items-center gap-2 sm:gap-4">
           <ThemeToggle className="hidden sm:block" />
-          <Link href="/login" className="px-2 text-[15px] font-medium hover:underline">
-            {h.nav.signIn}
-          </Link>
+          <NavSignIn label={h.nav.signIn} />
           <SignUpButton
             label={h.nav.start}
             className="rounded-lg px-4 py-2.5 text-[15px] font-semibold bg-[#CC1010] text-white hover:bg-[#B00D0D] transition"

@@ -24,7 +24,10 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // "Start free" links open straight on the sign-up form
-  const [mode, setMode] = useState<Mode>(params.get("mode") === "signup" ? "signup" : "signin");
+  const initial = params.get("mode");
+  const [mode, setMode] = useState<Mode>(
+    initial === "signup" || initial === "forgot" ? initial : "signin"
+  );
   const [error, setError] = useState<string | null>(params.get("error"));
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

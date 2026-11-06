@@ -147,3 +147,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .belt-fill { animation: none; }
 }
+@keyframes navSignIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
