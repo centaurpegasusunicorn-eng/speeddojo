@@ -27,16 +27,16 @@ export const HOME = {
     caption: "",
   },
 
-  metaTitle: "Guitar speed training you can measure",
+  metaTitle: "Guitar speed training you prove, belt by belt",
   metaDescription:
     "Tempo-synced practice videos, a dial that remembers your best, and a belt to earn for every exercise. Start Core Training free.",
 
   nav: { signIn: "Sign in", start: "Start free" },
 
   hero: {
-    headline: "Build real guitar speed, one clean rep at a time.",
+    headline: "Build guitar speed with a plan you prove, one belt at a time.",
     body:
-      "Play along with tempo-synced exercise videos, log every clean rep, and earn a belt for each exercise on the way to Black. The White belt is free.",
+      "Each exercise gives you a starting tempo and a target. Play along with the tempo-synced video, log your clean reps, and the next belt opens once you've played the target cleanly five times. The White belt is free.",
     primary: "Start free",
     secondary: "See what's included",
     note: "Free account. Works in your browser on computer, tablet, or phone.",
@@ -48,19 +48,19 @@ export const HOME = {
   },
 
   steps: {
-    heading: "How a belt is earned",
+    heading: "Follow the plan, then prove it",
     items: [
       {
-        title: "Play along at your tempo",
-        body: "Set the dial and the video, click, and count-in all follow. Start slow and nudge it up as the pattern settles.",
+        title: "Get the plan",
+        body: "Every exercise comes with a starting tempo and a target tempo, so you always know what today's practice is for.",
       },
       {
-        title: "Log the clean ones",
-        body: "After each run, tap Yes if it was clean. Your chart keeps every rep and every tempo, so progress is something you can see.",
+        title: "Practise at your tempo",
+        body: "Set the dial and the video, click, and count-in follow. Nudge the tempo up as the pattern settles, and log each clean rep.",
       },
       {
-        title: "Earn the belt",
-        body: "Five clean reps at the target tempo earns the belt and opens the next exercise.",
+        title: "Prove it to move on",
+        body: "Five clean reps at the target tempo earns the belt. The next exercise opens once you've proved it, so every belt means you can play it.",
       },
     ],
   },
