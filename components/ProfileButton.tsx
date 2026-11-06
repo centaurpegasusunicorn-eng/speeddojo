@@ -35,7 +35,7 @@ export default function ProfileButton({ className = "" }: { className?: string }
       href="/dojo"
       aria-label="My Dojo"
       title="My Dojo"
-      className={`w-14 h-14 lg:w-[72px] lg:h-[72px] shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-neutral-200 dark:bg-neutral-800 text-[22px] lg:text-[28px] font-semibold text-neutral-700 dark:text-neutral-200 ring-2 ring-transparent hover:ring-[#CC1010] transition ${className}`}
+      className={`w-11 h-11 lg:w-[66px] lg:h-[66px] shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-neutral-200 dark:bg-neutral-800 text-[18px] lg:text-[26px] font-semibold text-neutral-700 dark:text-neutral-200 ring-2 ring-transparent hover:ring-[#CC1010] transition ${className}`}
     >
       {photo ? (
         // eslint-disable-next-line @next/next/no-img-element
