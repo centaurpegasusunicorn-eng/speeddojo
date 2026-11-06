@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { Play, RotateCcw } from "lucide-react";
 import BpmGauge from "@/components/BpmGauge";
 import PathMenu from "@/components/PathMenu";
 import ProgressChart from "@/components/ProgressChart";
 import Countdown from "@/components/Countdown";
 import SignUpButton from "@/components/home/SignUpButton";
+import GuideVideo from "@/components/GuideVideo";
 import { ClickEngine } from "@/lib/clickEngine";
 import { useTheme } from "@/lib/theme";
 import { BELTS, REPS_TO_COMPLETE, pathState } from "@/lib/belts";
@@ -146,22 +147,25 @@ export default function AppDemo() {
               </span>
             )}
           </button>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="mt-4 grid sm:grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
             <div>
               <p className="text-xl font-bold">{EX.name}</p>
-              <p className="text-[15px] text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" style={{ background: BELT.color }} aria-hidden />
+              <p className="text-[15px] text-neutral-500 dark:text-neutral-400 flex items-start gap-2">
+                <span className="mt-[6px] w-2.5 h-2.5 shrink-0 rounded-full shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" style={{ background: BELT.color }} aria-hidden />
                 {BELT.name} Belt · {REPS_TO_COMPLETE} clean reps at {EX.endBpm} BPM earns it
               </p>
+              <p className="mt-2 text-[15px] text-neutral-600 dark:text-neutral-400 max-w-md">{EX.description}</p>
             </div>
-            <button
-              type="button"
-              onClick={toggle}
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[15px] font-semibold bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 hover:opacity-90 transition"
-            >
-              {playing ? <Pause size={16} aria-hidden /> : <Play size={16} aria-hidden />}
-              {playing ? "Pause" : "Play"}
-            </button>
+            {/* Rach's lesson for this exercise */}
+            <div className="w-full max-w-xs sm:w-56">
+              <GuideVideo
+                url={EX.guideVideoUrl ?? ""}
+                urlDark={EX.guideVideoUrlDark}
+                label={EX.guideLabel ?? "Watch the lesson"}
+                thumbnail={EX.guideThumb ?? ""}
+                onOpen={() => videoRef.current?.pause()}
+              />
+            </div>
           </div>
         </div>
 

@@ -15,6 +15,8 @@ import { Rep } from "./belts";
  *  guideVideoUrl       optional "how to approach this" video (normal speed,
  *                      opens in a pop-up). Leave out for no button.
  *  guideVideoUrlDark   optional dark-mode version of it
+ *  guideThumb          optional picture for the lesson video's thumbnail
+ *                      (shown on the homepage demo), e.g. "/home/lesson-1.jpg"
  *  guideLabel          optional button text (default "How to approach this
  *                      exercise")
  *
@@ -29,6 +31,7 @@ export type Exercise = {
   videoUrlDark?: string;
   guideVideoUrl?: string;
   guideVideoUrlDark?: string;
+  guideThumb?: string;
   guideLabel?: string;
   originalBpm: number;
   startBpm: number;
