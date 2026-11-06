@@ -18,6 +18,7 @@ import { priceLabel } from "@/lib/stripe";
 import { PRICING } from "@/lib/pricing";
 import { BRAND } from "@/lib/brand";
 import { HOME } from "@/lib/homepage";
+import { LESSON } from "@/lib/lessons";
 
 /*
  * The public homepage / sales page. Signed-in students skip straight to
@@ -262,6 +263,25 @@ export default async function Home({
           </div>
           <p className="mt-6 text-xl leading-relaxed text-neutral-700 dark:text-neutral-300">{h.founder.body}</p>
           <p className="mt-4 text-lg font-semibold">{h.founder.signature}</p>
+        </section>
+
+        {/* ── live lessons with Rach, for when someone's stuck ── */}
+        <section className="px-4 sm:px-8 max-w-5xl mx-auto pt-16 sm:pt-20">
+          <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 p-7 sm:p-10 grid md:grid-cols-[1fr_auto] gap-6 md:gap-10 items-center">
+            <div>
+              <h2 className="wide text-2xl sm:text-4xl font-extrabold tracking-[-0.015em]">{h.lessons.heading}</h2>
+              <p className="mt-3 text-lg leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-[36rem]">{h.lessons.body}</p>
+              <p className="mt-3 text-[15px] text-neutral-500 dark:text-neutral-400">
+                {LESSON.length} on a live video call, {LESSON.price}
+              </p>
+            </div>
+            <Link
+              href="/lessons"
+              className="justify-self-start md:justify-self-end rounded-xl px-7 py-4 text-lg font-bold border-2 border-neutral-900 dark:border-neutral-100 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-neutral-900 transition whitespace-nowrap"
+            >
+              {h.lessons.cta}
+            </Link>
+          </div>
         </section>
 
         {/* ── testimonials: only when there are real ones ── */}

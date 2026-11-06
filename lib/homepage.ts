@@ -86,6 +86,14 @@ export const HOME = {
     photo: "", // e.g. "/home/rach.jpg"; leave "" to show your initial
   },
 
+  // Live 1:1 lessons (price and length come from lib/lessons.ts)
+  lessons: {
+    heading: "Stuck on a belt? Book a live lesson with Rach",
+    body:
+      "Play the exercise for me on a video call and I'll find what's holding your speed back, then give you a plan to get past it.",
+    cta: "Book a lesson",
+  },
+
   // Real quotes only, added with the student's permission, e.g.
   // { quote: "...", name: "Maya", detail: "Green Belt, +34 BPM" }
   testimonials: [] as { quote: string; name: string; detail: string }[],
