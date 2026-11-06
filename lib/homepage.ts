@@ -9,6 +9,11 @@
  */
 
 export const HOME = {
+  // Hero layout: "split" (headline beside the video), "bottom" (full-screen
+  // video, headline bottom-left) or "center" (full-screen video, headline
+  // centred). Add ?hero=bottom (etc.) to the homepage address to preview one.
+  heroLayout: "split" as "split" | "bottom" | "center",
+
   metaTitle: "Guitar speed training you can measure",
   metaDescription:
     "Tempo-synced practice videos, a dial that remembers your best, and a belt to earn for every exercise. Start Core Training free.",

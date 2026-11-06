@@ -6,6 +6,7 @@ import { Check, Fish, Guitar, PawPrint } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import HeroVideo from "@/components/home/HeroVideo";
 import BeltBand from "@/components/home/BeltBand";
+import HeroFull from "@/components/home/HeroFull";
 import { createClient } from "@/lib/supabase/server";
 import { priceLabel } from "@/lib/stripe";
 import { PRICING } from "@/lib/pricing";
@@ -25,16 +26,34 @@ export const metadata: Metadata = {
 const SIGN_UP = "/login?mode=signup";
 const SIGN_UP_THEN_BUY = "/login?mode=signup&next=/unlock";
 
-export default async function Home() {
+type HeroLayout = "split" | "bottom" | "center";
+const LAYOUTS: HeroLayout[] = ["split", "bottom", "center"];
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   if (data?.claims) redirect("/dashboard");
+
+  // The hero layout is set in lib/homepage.ts; ?hero=split|bottom|center
+  // previews another one without changing anything
+  const { hero } = await searchParams;
+  const layout: HeroLayout = LAYOUTS.includes(hero as HeroLayout)
+    ? (hero as HeroLayout)
+    : HOME.heroLayout;
 
   const price = await priceLabel();
   const h = HOME;
 
   return (
     <div className="home w-full text-neutral-900 dark:text-neutral-100">
+      {layout !== "split" ? (
+        <HeroFull variant={layout} signUp={SIGN_UP} />
+      ) : (
+      <>
       {/* ── nav ── */}
       <header className="px-4 sm:px-8 h-20 flex items-center justify-between max-w-7xl mx-auto">
         <span className="text-lg sm:text-xl tracking-[0.3em] font-light text-neutral-800 dark:text-neutral-200">
@@ -54,7 +73,7 @@ export default async function Home() {
         </nav>
       </header>
 
-      <main>
+      <div>
         {/* ── hero ── */}
         <section className="px-4 sm:px-8 max-w-7xl mx-auto pt-8 sm:pt-14 pb-12 sm:pb-16 grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-14 items-center">
           <div>
@@ -87,6 +106,17 @@ export default async function Home() {
           <BeltBand />
           <p className="mt-5 text-lg text-neutral-700 dark:text-neutral-300">{h.band.caption}</p>
         </section>
+      </div>
+      </>
+      )}
+
+      <main>
+        {/* full-screen heroes carry the belts along their bottom edge */}
+        {layout !== "split" && (
+          <p className="px-4 sm:px-8 max-w-7xl mx-auto pt-10 text-lg text-neutral-700 dark:text-neutral-300">
+            {h.band.caption}
+          </p>
+        )}
 
         {/* ── how a belt is earned (a real sequence, so it's numbered) ── */}
         <section className="px-4 sm:px-8 max-w-7xl mx-auto pt-24 sm:pt-32">
