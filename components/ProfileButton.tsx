@@ -23,8 +23,8 @@ export default function ProfileButton({ className = "" }: { className?: string }
       .then((d) => {
         if (!d) return;
         const c = document.createElement("canvas");
-        c.width = c.height = 96;
-        c.getContext("2d")!.drawImage(d.photo, 0, 0, 96, 96);
+        c.width = c.height = 192;
+        c.getContext("2d")!.drawImage(d.photo, 0, 0, 192, 192);
         setPhoto(c.toDataURL("image/jpeg", 0.85));
       })
       .catch(() => {});
@@ -35,7 +35,7 @@ export default function ProfileButton({ className = "" }: { className?: string }
       href="/dojo"
       aria-label="My Dojo"
       title="My Dojo"
-      className={`w-9 h-9 shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-neutral-200 dark:bg-neutral-800 text-[15px] font-semibold text-neutral-700 dark:text-neutral-200 ring-2 ring-transparent hover:ring-[#CC1010] transition ${className}`}
+      className={`w-14 h-14 lg:w-[72px] lg:h-[72px] shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-neutral-200 dark:bg-neutral-800 text-[22px] lg:text-[28px] font-semibold text-neutral-700 dark:text-neutral-200 ring-2 ring-transparent hover:ring-[#CC1010] transition ${className}`}
     >
       {photo ? (
         // eslint-disable-next-line @next/next/no-img-element
