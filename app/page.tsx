@@ -8,6 +8,7 @@ import HeroVideo from "@/components/home/HeroVideo";
 import BeltBand from "@/components/home/BeltBand";
 import HeroFull from "@/components/home/HeroFull";
 import TryIt from "@/components/home/TryIt";
+import DialHero from "@/components/home/DialHero";
 import { createClient } from "@/lib/supabase/server";
 import { priceLabel } from "@/lib/stripe";
 import { PRICING } from "@/lib/pricing";
@@ -27,8 +28,8 @@ export const metadata: Metadata = {
 const SIGN_UP = "/login?mode=signup";
 const SIGN_UP_THEN_BUY = "/login?mode=signup&next=/unlock";
 
-type HeroLayout = "try" | "split" | "bottom" | "center";
-const LAYOUTS: HeroLayout[] = ["try", "split", "bottom", "center"];
+type HeroLayout = "dial" | "try" | "split" | "bottom" | "center";
+const LAYOUTS: HeroLayout[] = ["dial", "try", "split", "bottom", "center"];
 
 export default async function Home({
   searchParams,
@@ -93,7 +94,16 @@ export default async function Home({
       </header>
 
       <div>
-        {layout === "try" ? (
+        {layout === "dial" ? (
+          <DialHero
+            headline={h.hero.headline}
+            body={h.hero.body}
+            primary={h.hero.primary}
+            primaryHref={SIGN_UP}
+            note={h.hero.note}
+            hint={h.hero.dialHint}
+          />
+        ) : layout === "try" ? (
           /* ── hero: words, then the working practice player ── */
           <section className="px-4 sm:px-8 max-w-7xl mx-auto pt-8 sm:pt-12 pb-12 sm:pb-16">
             <div className="grid lg:grid-cols-[1.15fr_1fr] gap-6 lg:gap-14 items-end">
@@ -130,7 +140,7 @@ export default async function Home({
         )}
 
         {/* ── the belt band: the whole path in one line ── */}
-        <section className="px-4 sm:px-8 max-w-7xl mx-auto">
+        <section className={`px-4 sm:px-8 max-w-7xl mx-auto ${layout === "dial" ? "pt-16 sm:pt-24" : ""}`}>
           <BeltBand />
           <p className="mt-5 text-lg text-neutral-700 dark:text-neutral-300">{h.band.caption}</p>
         </section>

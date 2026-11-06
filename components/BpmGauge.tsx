@@ -144,7 +144,8 @@ export default function BpmGauge({
   videoRef,
   best,
   onJumpToBest,
-}: Props) {
+  large = false,
+}: Props & { large?: boolean }) {
   const dark = useTheme() === "dark";
   const [bestHover, setBestHover] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -221,7 +222,8 @@ export default function BpmGauge({
 
   return (
     <div
-      className="relative w-full max-w-[460px] mx-auto aspect-square"
+      // large: fill whatever space it's given (the homepage hero)
+      className={`relative w-full mx-auto aspect-square ${large ? "" : "max-w-[460px]"}`}
       style={{ containerType: "inline-size" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
