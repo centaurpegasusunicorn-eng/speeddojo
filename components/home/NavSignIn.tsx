@@ -1,140 +1,63 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import EmailAuth from "@/components/EmailAuth";
 
 /*
- * "Sign in" in the homepage top bar. Clicking it slides the email and
- * password fields open right in the bar (on phones, a panel just under it),
- * so returning students sign in without leaving the page.
+ * "Sign in" in the homepage top bar: opens a small panel right under it with
+ * the same email sign-in as everywhere else (link or code, or a password if
+ * they've set one). No trip to another page.
  */
 export default function NavSignIn({ label = "Sign in" }: { label?: string }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    emailRef.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onClick = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) setOpen(false);
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("mousedown", onClick);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("mousedown", onClick);
+    };
   }, [open]);
 
-  // For students who signed up with just an email: send a sign-in link
-  async function sendLink() {
-    if (!email) {
-      setError("Enter your email first.");
-      emailRef.current?.focus();
-      return;
-    }
-    setError(null);
-    setLoading(true);
-    const { error } = await createClient().auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: false,
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-      },
-    });
-    setLoading(false);
-    if (error) return setError(error.message);
-    setNotice("Check your email for a sign-in link.");
-  }
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    const { error } = await createClient().auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) return setError(error.message);
-    router.push("/dashboard");
-    router.refresh();
-  }
-
-  const field =
-    "w-full rounded-lg px-3.5 py-2.5 text-[15px] outline-none border bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-[#CC1010]";
-
   return (
-    <>
-      {!open && (
-        <button type="button" onClick={() => setOpen(true)} className="px-2 text-[15px] font-medium hover:underline">
-          {label}
-        </button>
-      )}
-
+    <div ref={panelRef} className="sm:relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="px-2 text-[15px] font-medium hover:underline"
+      >
+        {label}
+      </button>
       {open && (
-        <form
-          onSubmit={submit}
+        <div
+          role="dialog"
           aria-label="Sign in"
-          // phones: a panel under the bar; wider screens: inline in the bar
-          className="absolute lg:static left-0 right-0 top-20 lg:top-auto z-40 px-4 lg:px-0 py-4 lg:py-0 bg-white dark:bg-black lg:bg-transparent lg:dark:bg-transparent border-b lg:border-0 border-neutral-200 dark:border-neutral-800 shadow-lg lg:shadow-none"
-          style={{ animation: "navSignIn 0.25s ease-out both" }}
+          className="absolute z-40 left-0 right-0 top-20 sm:top-full sm:left-auto sm:right-0 sm:mt-3 sm:w-[380px] px-4 py-5 sm:p-5 bg-white dark:bg-neutral-950 border-y sm:border sm:rounded-2xl border-neutral-200 dark:border-neutral-800 shadow-xl text-neutral-900 dark:text-neutral-100"
+          style={{ animation: "buRise 0.2s ease-out both" }}
         >
-          <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-            <input
-              ref={emailRef}
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="Email"
-              aria-label="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={`${field} lg:w-52`}
-            />
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              placeholder="Password"
-              aria-label="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={`${field} lg:w-40`}
-            />
-            <div className="flex items-center gap-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 lg:flex-none rounded-lg px-4 py-2.5 text-[15px] font-semibold bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 hover:opacity-90 disabled:opacity-60 transition"
-              >
-                {loading ? "Signing in…" : "Sign in"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Close"
-                className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900"
-              >
-                <X size={18} />
-              </button>
-            </div>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-lg font-bold">Sign in</p>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900"
+            >
+              <X size={18} />
+            </button>
           </div>
-          <div className="mt-2 lg:mt-0 lg:absolute lg:translate-y-1.5 flex gap-4 text-[13px] text-neutral-500 dark:text-neutral-400">
-            {error && <span className="text-[#E5484D]">{error}</span>}
-            {notice ? (
-              <span className="text-green-700 dark:text-green-400">{notice}</span>
-            ) : (
-              <button type="button" onClick={sendLink} className="hover:underline">
-                Email me a sign-in link
-              </button>
-            )}
-            <Link href="/login?mode=forgot" className="hover:underline">
-              Forgot password?
-            </Link>
-          </div>
-        </form>
+          <EmailAuth size="sm" cta="Email me a sign-in link" autoFocus allowPassword hint="We'll email you a link and a code." />
+        </div>
       )}
-    </>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ThemeToggle from "@/components/ThemeToggle";
+import EmailAuth from "@/components/EmailAuth";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -103,17 +104,35 @@ export default function LoginForm() {
     router.refresh();
   }
 
+  if (mode !== "forgot") {
+    return (
+      <main className="max-w-sm w-full mx-auto px-4 py-20">
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="text-lg font-medium">Enter the Dojo</h1>
+          <ThemeToggle />
+        </div>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
+          Enter your email and we&apos;ll send you a sign-in link and code. New here? The same box
+          creates your free account.
+        </p>
+        {error && (
+          <p role="alert" className="mb-3 text-sm text-red-600 dark:text-red-400">
+            {error}
+          </p>
+        )}
+        <EmailAuth next={next} cta="Email me a sign-in link" size="sm" autoFocus allowPassword hint="" />
+      </main>
+    );
+  }
+
+  // Password reset ("Forgot password?")
   return (
     <main className="max-w-sm w-full mx-auto px-4 py-20">
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-lg font-medium">
-          {mode === "forgot" ? "Reset your password" : "Enter the Dojo"}
-        </h1>
+        <h1 className="text-lg font-medium">Reset your password</h1>
         <ThemeToggle />
       </div>
-      <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
-        {COPY[mode].sub}
-      </p>
+      <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">{COPY.forgot.sub}</p>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
@@ -125,38 +144,6 @@ export default function LoginForm() {
           required
           className="w-full border border-neutral-300 dark:border-neutral-700 dark:bg-neutral-950 rounded-md px-3 py-2 text-sm"
         />
-        {mode !== "forgot" && (
-          <input
-            type="password"
-            placeholder="Password"
-            autoComplete={mode === "signup" ? "new-password" : "current-password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full border border-neutral-300 dark:border-neutral-700 dark:bg-neutral-950 rounded-md px-3 py-2 text-sm"
-          />
-        )}
-
-        {mode === "signin" && (
-          <div className="flex flex-wrap gap-x-4 gap-y-1">
-            <button
-              type="button"
-              onClick={sendLink}
-              className="text-sm text-neutral-500 dark:text-neutral-400 underline"
-            >
-              Email me a sign-in link
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode("forgot")}
-              className="text-sm text-neutral-500 dark:text-neutral-400 underline"
-            >
-              Forgot password?
-            </button>
-          </div>
-        )}
-
         {error && (
           <p role="alert" className="text-sm text-red-600 dark:text-red-400">
             {error}
@@ -167,23 +154,17 @@ export default function LoginForm() {
             {notice}
           </p>
         )}
-
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 rounded-md py-2 text-sm font-medium disabled:opacity-50"
         >
-          {loading ? "Please wait…" : COPY[mode].button}
+          {loading ? "Please wait…" : COPY.forgot.button}
         </button>
       </form>
 
-      <button
-        onClick={() => switchMode(mode === "signin" ? "signup" : "signin")}
-        className="text-sm text-neutral-500 dark:text-neutral-400 underline mt-4"
-      >
-        {mode === "signin"
-          ? "Need an account? Sign up"
-          : "Already have an account? Sign in"}
+      <button onClick={() => switchMode("signin")} className="text-sm text-neutral-500 dark:text-neutral-400 underline mt-4">
+        Back to sign in
       </button>
     </main>
   );
