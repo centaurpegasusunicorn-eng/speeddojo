@@ -32,8 +32,8 @@ export const PRICING = {
 
   // After paying
   unlockedHeadline: "You're in. All 12 belts are unlocked.",
-  unlockedBody: "Your progress is saved. Pick up where you left off.",
-  unlockedCta: "Start the next belt",
+  unlockedBody: "Every belt from White to Black is open to you now, and your progress is saved.",
+  unlockedCta: "Go to my dojo",
 
   // The offer in the video space on a locked belt
   panelHeadline: "Unlock all 12 belts",

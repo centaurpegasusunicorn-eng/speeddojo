@@ -5,7 +5,6 @@ import { BRAND } from "@/lib/brand";
 import { PRICING } from "@/lib/pricing";
 import { getAccess, recordCheckout } from "@/lib/access";
 import { paymentsOn, stripe } from "@/lib/stripe";
-import { EXERCISES } from "@/lib/mockData";
 
 /*
  * Where Stripe sends students after paying. Checks the payment with Stripe
@@ -32,8 +31,6 @@ export default async function UnlockedPage({
     }
   }
 
-  const next = EXERCISES[Math.min(PRICING.FREE_EXERCISES, EXERCISES.length - 1)];
-
   return (
     <main className="w-full px-4 sm:px-8 pb-16">
       <header className="h-20 flex items-center justify-between">
@@ -59,7 +56,7 @@ export default async function UnlockedPage({
               {PRICING.unlockedBody}
             </p>
             <Link
-              href={`/practice/${next.id}`}
+              href="/dashboard"
               className="mt-8 inline-flex items-center justify-center rounded-lg px-7 py-3.5 text-lg font-semibold bg-[#CC1010] text-white hover:bg-[#B00D0D] active:scale-[0.98] transition"
             >
               {PRICING.unlockedCta}

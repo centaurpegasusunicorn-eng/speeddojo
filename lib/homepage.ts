@@ -119,8 +119,8 @@ export const HOME = {
       ],
       cta: "Get the full dojo",
       // the pop-up form behind that button
-      formTitle: "Create your account",
-      formBody: "Then you'll go straight to secure checkout to unlock all 12 belts.",
+      formTitle: "Get the full dojo",
+      formBody: "Enter your email and we'll send you a link. It takes you straight to secure checkout to unlock all 12 belts.",
       formCta: "Continue to checkout",
     },
     oneOffNote: "One payment for a year of access.",

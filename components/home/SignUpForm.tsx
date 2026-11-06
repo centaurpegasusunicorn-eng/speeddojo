@@ -29,7 +29,6 @@ export default function SignUpForm({
       autoFocus={autoFocus}
       dark={dark}
       placeholder={placeholder}
-      allowPassword
       hint="Already a student? Same box: we'll email you a sign-in link."
     />
   );

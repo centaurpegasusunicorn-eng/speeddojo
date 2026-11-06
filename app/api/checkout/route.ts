@@ -6,13 +6,26 @@ import { paymentsOn, priceId, stripe } from "@/lib/stripe";
  * The "Unlock" button posts here. Creates a Stripe Checkout page for the
  * Full Dojo price and sends the student to it. Works for a one-off price
  * or a yearly (recurring) one, whichever the Stripe price is.
+ *
+ * GET is the homepage "Get the full dojo" route: after the sign-in link,
+ * /dashboard?buy sends new buyers here, straight to Stripe. Anyone who
+ * already has the full dojo goes back to their dojo instead.
  */
 export async function POST(request: NextRequest) {
+  return checkout(request, false);
+}
+
+export async function GET(request: NextRequest) {
+  return checkout(request, true);
+}
+
+async function checkout(request: NextRequest, fromHomepage: boolean) {
   const origin = request.nextUrl.origin;
-  if (!paymentsOn()) return NextResponse.redirect(`${origin}/unlock`, 303);
+  if (!paymentsOn()) return NextResponse.redirect(`${origin}/${fromHomepage ? "dashboard" : "unlock"}`, 303);
 
   const access = await getAccess();
   if (!access.userId) return NextResponse.redirect(`${origin}/login?next=/unlock`, 303);
+  if (fromHomepage && access.member) return NextResponse.redirect(`${origin}/dashboard`, 303);
   if (access.member && access.recurring) {
     // already subscribed: nothing to buy
     return NextResponse.redirect(`${origin}/unlock`, 303);

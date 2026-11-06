@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Camera, Lock, KeyRound, Play, CreditCard } from "lucide-react";
+import { ArrowLeft, Camera, Lock, Play, CreditCard } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import SignOutButton from "@/components/SignOutButton";
 import BeltPhoto from "@/components/BeltPhoto";
@@ -25,7 +25,7 @@ import { PROGRAM } from "@/lib/programs";
  * MY DOJO: everything personal in one place.
  *  1. Overview: Day 1 photo, current belt, headline numbers
  *  2. My belts: all 12, with "Make my card" on each one earned
- *  3. Account: email, membership, password, photo, welcome video, sign out
+ *  3. Account: email, membership, photo, welcome video, sign out
  * Opened from the round profile button in the top bar.
  */
 export default function MyDojoPage() {
@@ -217,15 +217,6 @@ export default function MyDojoPage() {
                   <CreditCard size={16} aria-hidden /> {access.member ? "Billing and receipts" : "Unlock all 12 belts"}
                 </Link>
               ) : null
-            }
-          />
-          <Row
-            label="Password"
-            value="••••••••"
-            action={
-              <Link href="/reset-password" className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-neutral-700 dark:text-neutral-300 hover:underline">
-                <KeyRound size={16} aria-hidden /> Set or change
-              </Link>
             }
           />
           <Row

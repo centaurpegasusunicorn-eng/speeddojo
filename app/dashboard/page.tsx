@@ -10,11 +10,21 @@ import { needsWelcome } from "@/lib/day1";
 import { importDemoReps } from "@/lib/demoReps";
 
 /*
+ * THE ONE LANDING SPOT. Every sign-in link, the logo, and emails come here,
+ * and it decides where to go:
+ *   1. any reps logged in the homepage demo are added to the account
+ *   2. ?buy (from "Get the full dojo"): straight to Stripe checkout
+ *   3. new students who haven't had the welcome: the welcome
+ *   4. everyone else: their exercise (below)
+ *
  * There's no separate dashboard any more: the practice screen shows
  * everything. This address (used after sign-in, by the logo, and in emails)
  * just sends the student to the exercise they practised most recently,
  * or to the one they're working towards if they haven't practised yet.
  */
+// The day the welcome page went live
+const WELCOME_SINCE = "2026-10-24";
+
 export default function DashboardRedirect() {
   const router = useRouter();
 
@@ -27,6 +37,23 @@ export default function DashboardRedirect() {
         return;
       }
       const userId = data.user.id;
+
+      // 1. reps they logged in the homepage demo before signing up
+      await importDemoReps();
+
+      // 2. came from "Get the full dojo": checkout first, welcome after
+      if (new URLSearchParams(window.location.search).has("buy")) {
+        window.location.replace("/api/checkout");
+        return;
+      }
+
+      // 3. new students start with the welcome (intro video + Day 1 photo).
+      //    Only accounts made since the welcome existed; older students skip it.
+      const createdAt = data.user.created_at ?? "";
+      if (createdAt >= WELCOME_SINCE && (await needsWelcome())) {
+        router.replace("/welcome");
+        return;
+      }
 
       // Most recent activity: the newest logged rep or practice session
       const [rep, time] = await Promise.all([
@@ -45,16 +72,6 @@ export default function DashboardRedirect() {
           .limit(1)
           .maybeSingle(),
       ]);
-      // Reps they logged in the homepage demo before signing up
-      const fresh = !rep.data && !time.data;
-      await importDemoReps();
-
-      // Brand-new students start with the welcome (intro video + Day 1 photo)
-      if (fresh && (await needsWelcome())) {
-        router.replace("/welcome");
-        return;
-      }
-
       const latest = [rep.data, time.data]
         .filter((r): r is { exercise_id: string; created_at: string } => !!r)
         .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];

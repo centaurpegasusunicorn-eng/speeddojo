@@ -322,7 +322,7 @@ export default async function Home({
               action={
                 <SignUpButton
                   label={h.pricing.full.cta}
-                  next="/unlock"
+                  next="/dashboard?buy"
                   title={h.pricing.full.formTitle}
                   body={h.pricing.full.formBody}
                   cta={h.pricing.full.formCta}

@@ -6,8 +6,7 @@ import EmailAuth from "@/components/EmailAuth";
 
 /*
  * "Sign in" in the homepage top bar: opens a small panel right under it with
- * the same email sign-in as everywhere else (link or code, or a password if
- * they've set one). No trip to another page.
+ * the same email sign-in as everywhere else. No trip to another page.
  */
 export default function NavSignIn({ label = "Sign in" }: { label?: string }) {
   const [open, setOpen] = useState(false);
@@ -55,7 +54,7 @@ export default function NavSignIn({ label = "Sign in" }: { label?: string }) {
               <X size={18} />
             </button>
           </div>
-          <EmailAuth size="sm" cta="Email me a sign-in link" autoFocus allowPassword hint="We'll email you a link and a code." />
+          <EmailAuth size="sm" cta="Email me a sign-in link" autoFocus hint="We'll email you a link to sign in." />
         </div>
       )}
     </div>
