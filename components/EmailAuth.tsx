@@ -18,6 +18,9 @@ import { createClient } from "@/lib/supabase/client";
 
 type Step = "email" | "code" | "password";
 
+// true once the sign-in emails include the 6-digit code ({{ .Token }})
+const SHOW_CODE = false;
+
 export default function EmailAuth({
   next = "/dashboard",
   cta = "Start free",
@@ -51,13 +54,16 @@ export default function EmailAuth({
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The code box only shows when asked for, until the sign-in emails include
+  // a code (needs custom email templates). Set SHOW_CODE true once they do.
+  const [codeOpen, setCodeOpen] = useState(SHOW_CODE);
   const codeRef = useRef<HTMLInputElement>(null);
   const passRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (step === "code") codeRef.current?.focus();
+    if (step === "code" && codeOpen) codeRef.current?.focus();
     if (step === "password") passRef.current?.focus();
-  }, [step]);
+  }, [step, codeOpen]);
 
   const go = () => {
     router.push(next);
@@ -116,8 +122,11 @@ export default function EmailAuth({
       <form onSubmit={checkCode} className="w-full text-left" style={{ animation: "buRise 0.3s ease-out both" }}>
         <p className={`${sm ? "text-[15px]" : "text-lg"} font-semibold`}>Check your email</p>
         <p className={`mt-1 ${sm ? "text-[14px]" : "text-[15px]"} ${dark ? "text-white/70" : "text-neutral-600 dark:text-neutral-400"}`}>
-          We&apos;ve sent an email to {email}. Click the link in it, or type the code from it here:
+          {codeOpen
+            ? <>We&apos;ve sent an email to {email}. Click the link in it, or type the code from it here:</>
+            : <>We&apos;ve sent a sign-in link to {email}. Open it on this device and you&apos;ll go straight in.</>}
         </p>
+        {codeOpen && (
         <div className={`mt-3 ${layout}`}>
           <label className="sr-only" htmlFor={`${uid}-code`}>Code from the email</label>
           <input
@@ -137,8 +146,14 @@ export default function EmailAuth({
             {loading ? "Checking…" : "Sign in"}
           </button>
         </div>
+        )}
         {error && <p className="mt-2 text-[14px] text-[#E5484D]">{error}</p>}
         <p className={`mt-3 text-[14px] ${muted} flex flex-wrap gap-x-4 gap-y-1`}>
+          {!codeOpen && (
+            <button type="button" className={link} onClick={() => setCodeOpen(true)}>
+              Got a code?
+            </button>
+          )}
           <button type="button" className={link} onClick={() => sendEmail()}>
             Send it again
           </button>
