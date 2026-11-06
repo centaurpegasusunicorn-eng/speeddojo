@@ -6,7 +6,7 @@ import BpmGauge from "@/components/BpmGauge";
 import PathMenu from "@/components/PathMenu";
 import ProgressChart from "@/components/ProgressChart";
 import Countdown from "@/components/Countdown";
-import SignUpButton from "@/components/home/SignUpButton";
+import SignUpForm from "@/components/home/SignUpForm";
 import GuideVideo from "@/components/GuideVideo";
 import { ClickEngine } from "@/lib/clickEngine";
 import { useTheme } from "@/lib/theme";
@@ -32,6 +32,7 @@ export default function AppDemo() {
   const [bpm, setBpm] = useState(EX.startBpm);
   const [playing, setPlaying] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [showForm, setShowForm] = useState(false); // sign-up opened from "Log it free"
   const name = dark ? "white-dark" : "white";
   const path = useMemo(() => pathState(EXERCISES, []), []);
 
@@ -93,60 +94,77 @@ export default function AppDemo() {
           </div>
         </div>
         <div className="min-h-[4.5rem] flex items-center justify-center lg:justify-end">
-          {finished ? (
-            <div className="w-full rounded-xl bg-neutral-100 dark:bg-neutral-900 px-5 py-4" style={{ animation: "buRise 0.4s ease-out both" }}>
-              <p className="text-lg font-bold">Was that rep clean?</p>
-              <p className="mt-0.5 text-[15px] text-neutral-600 dark:text-neutral-400">
-                Make a free account to log it and start earning your White belt.
-              </p>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <SignUpButton
-                  label="Log it free"
-                  className="rounded-lg px-5 py-2.5 text-[15px] font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] transition"
-                />
-                <button type="button" onClick={toggle} className="inline-flex items-center gap-1.5 text-[15px] text-neutral-600 dark:text-neutral-400 hover:underline">
-                  <RotateCcw size={15} aria-hidden /> Play again
-                </button>
-              </div>
-            </div>
-          ) : (
-            <Countdown videoRef={videoRef} />
-          )}
+          {!finished && <Countdown videoRef={videoRef} />}
         </div>
       </div>
 
       <div className="mt-4 grid lg:grid-cols-[minmax(0,1fr)_minmax(0,32%)] gap-6 lg:gap-8">
         {/* the highway */}
         <div>
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={playing ? "Pause" : "Play"}
-            className="relative block w-full rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 aspect-video cursor-pointer bg-neutral-200 dark:bg-neutral-900"
-          >
-            <video
-              ref={videoRef}
-              key={name}
-              src={`/home/${name}.mp4`}
-              poster={`/home/${name}.jpg`}
-              playsInline
-              preload="metadata"
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-              onEnded={() => {
-                setPlaying(false);
-                setFinished(true);
-              }}
-              className="block w-full h-full object-cover"
-            />
-            {!playing && !finished && (
-              <span className="absolute inset-0 flex items-center justify-center bg-black/5">
-                <span className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#CC1010] text-white flex items-center justify-center shadow-[0_10px_30px_rgba(204,16,16,0.4)]">
-                  <Play size={32} fill="currentColor" className="ml-1" aria-hidden />
+          <div className="relative">
+            <button
+              type="button"
+              onClick={toggle}
+              aria-label={playing ? "Pause" : "Play"}
+              className="relative block w-full rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 aspect-video cursor-pointer bg-neutral-200 dark:bg-neutral-900"
+            >
+              <video
+                ref={videoRef}
+                key={name}
+                src={`/home/${name}.mp4`}
+                poster={`/home/${name}.jpg`}
+                playsInline
+                preload="metadata"
+                onPlay={() => setPlaying(true)}
+                onPause={() => setPlaying(false)}
+                onEnded={() => {
+                  setPlaying(false);
+                  setFinished(true);
+                }}
+                className="block w-full h-full object-cover"
+              />
+              {!playing && !finished && (
+                <span className="absolute inset-0 flex items-center justify-center bg-black/5">
+                  <span className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#CC1010] text-white flex items-center justify-center shadow-[0_10px_30px_rgba(204,16,16,0.4)]">
+                    <Play size={32} fill="currentColor" className="ml-1" aria-hidden />
+                  </span>
                 </span>
-              </span>
+              )}
+            </button>
+            {/* end of the rep: on wide screens an end screen over the video, on phones just under it */}
+            {finished && (
+              <div className="mt-4 lg:mt-0 lg:absolute lg:inset-0 lg:rounded-xl lg:bg-black/45 lg:backdrop-blur-[2px] flex items-center justify-center lg:p-6">
+                <div className="w-full max-w-md rounded-xl bg-neutral-100 dark:bg-neutral-900 lg:bg-white lg:dark:bg-neutral-950 lg:shadow-2xl px-5 py-4" style={{ animation: "buRise 0.4s ease-out both" }}>
+                  <p className="text-lg font-bold">Was that rep clean?</p>
+                  <p className="mt-0.5 text-[15px] text-neutral-600 dark:text-neutral-400">
+                    Make a free account to log it and start earning your White belt.
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
+                    {!showForm && (
+                      <button
+                        type="button"
+                        onClick={() => setShowForm(true)}
+                        className="rounded-lg px-5 py-2.5 text-[15px] font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] transition"
+                      >
+                        Log it free
+                      </button>
+                    )}
+                    <button type="button" onClick={toggle} className="inline-flex items-center gap-1.5 text-[15px] text-neutral-600 dark:text-neutral-400 hover:underline">
+                      <RotateCcw size={15} aria-hidden /> Play again
+                    </button>
+                  </div>
+                  {/* the sign-up form slides open right here */}
+                  <div className={`grid transition-[grid-template-rows] duration-300 ${showForm ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                    <div className="min-h-0 overflow-hidden" inert={!showForm}>
+                      <div className="pt-4">
+                        {showForm && <SignUpForm cta="Create free account" autoFocus />}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
-          </button>
+          </div>
           <div className="mt-4 grid sm:grid-cols-[minmax(0,1fr)_auto] gap-4 items-start">
             <div>
               <p className="text-xl font-bold">{EX.name}</p>

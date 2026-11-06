@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -28,6 +28,7 @@ export default function SignUpForm({
   dark?: boolean;
 }) {
   const router = useRouter();
+  const uid = useId(); // unique field ids, so several forms can share a page
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,9 +72,9 @@ export default function SignUpForm({
   return (
     <form onSubmit={submit} className="w-full">
       <div className={row ? "flex flex-col sm:flex-row gap-2.5" : "flex flex-col gap-2.5"}>
-        <label className="sr-only" htmlFor={`su-email-${next}`}>Email</label>
+        <label className="sr-only" htmlFor={`${uid}-email`}>Email</label>
         <input
-          id={`su-email-${next}`}
+          id={`${uid}-email`}
           type="email"
           required
           autoComplete="email"
@@ -83,9 +84,9 @@ export default function SignUpForm({
           onChange={(e) => setEmail(e.target.value)}
           className={field}
         />
-        <label className="sr-only" htmlFor={`su-pass-${next}`}>Password</label>
+        <label className="sr-only" htmlFor={`${uid}-pass`}>Password</label>
         <input
-          id={`su-pass-${next}`}
+          id={`${uid}-pass`}
           type="password"
           required
           minLength={6}
