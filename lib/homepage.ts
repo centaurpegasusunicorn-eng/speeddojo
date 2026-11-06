@@ -9,12 +9,13 @@
  */
 
 export const HOME = {
-  // Hero layout: "dial" (headline, then the real tempo dial huge and
+  // Hero layout: "app" (headline and sign-up, then a live copy of the
+  // practice screen: path, highway, dial and chart), "dial" (headline, then the real tempo dial huge and
   // centred, half above the fold, with the highway under it), "try" (headline, then a working practice player with the
   // real dial and click), "split" (headline beside a looping clip), "bottom"
   // or "center" (full-screen video). Add ?hero=split (etc.) to the homepage
   // address to preview one.
-  heroLayout: "dial" as "dial" | "try" | "split" | "bottom" | "center",
+  heroLayout: "app" as "app" | "dial" | "try" | "split" | "bottom" | "center",
 
   // Your full-width video, straight after the belt band: put the file in
   // /public/home and name it here, e.g. "/home/rach.mp4". Leave "" for the

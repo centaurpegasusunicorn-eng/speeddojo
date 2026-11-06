@@ -9,6 +9,7 @@ import BeltBand from "@/components/home/BeltBand";
 import HeroFull from "@/components/home/HeroFull";
 import TryIt from "@/components/home/TryIt";
 import DialHero from "@/components/home/DialHero";
+import AppDemo from "@/components/home/AppDemo";
 import SignUpForm from "@/components/home/SignUpForm";
 import SignUpButton from "@/components/home/SignUpButton";
 import NavSignIn from "@/components/home/NavSignIn";
@@ -30,8 +31,8 @@ export const metadata: Metadata = {
 
 const SIGN_UP = "/login?mode=signup";
 
-type HeroLayout = "dial" | "try" | "split" | "bottom" | "center";
-const LAYOUTS: HeroLayout[] = ["dial", "try", "split", "bottom", "center"];
+type HeroLayout = "app" | "dial" | "try" | "split" | "bottom" | "center";
+const LAYOUTS: HeroLayout[] = ["app", "dial", "try", "split", "bottom", "center"];
 
 export default async function Home({
   searchParams,
@@ -90,7 +91,25 @@ export default async function Home({
       </header>
 
       <div>
-        {layout === "dial" ? (
+        {layout === "app" ? (
+          /* ── hero: words and sign-up, then the real practice screen ── */
+          <section className="px-4 sm:px-8 max-w-7xl mx-auto pt-6 sm:pt-10 pb-12 sm:pb-16">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="wide text-[2.2rem] leading-[1.03] sm:text-5xl lg:text-[3.6rem] font-extrabold tracking-[-0.025em]">
+                {h.hero.headline}
+              </h1>
+              <p className="mt-4 text-lg sm:text-xl leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-[44rem] mx-auto">
+                {h.hero.body}
+              </p>
+              <div id="start" className="mt-6 w-full max-w-2xl mx-auto">
+                <SignUpForm row cta={h.hero.primary} />
+              </div>
+            </div>
+            <div className="mt-10 sm:mt-12">
+              <AppDemo />
+            </div>
+          </section>
+        ) : layout === "dial" ? (
           <DialHero
             headline={h.hero.headline}
             body={h.hero.body}
