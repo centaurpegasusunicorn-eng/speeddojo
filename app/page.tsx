@@ -2,11 +2,12 @@ import "@fontsource-variable/archivo/wdth.css";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { Check, Fish, Guitar, PawPrint } from "lucide-react";
+import { Check, Fish, Guitar, PawPrint, Play } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import HeroVideo from "@/components/home/HeroVideo";
 import BeltBand from "@/components/home/BeltBand";
 import HeroFull from "@/components/home/HeroFull";
+import TryIt from "@/components/home/TryIt";
 import { createClient } from "@/lib/supabase/server";
 import { priceLabel } from "@/lib/stripe";
 import { PRICING } from "@/lib/pricing";
@@ -26,8 +27,8 @@ export const metadata: Metadata = {
 const SIGN_UP = "/login?mode=signup";
 const SIGN_UP_THEN_BUY = "/login?mode=signup&next=/unlock";
 
-type HeroLayout = "split" | "bottom" | "center";
-const LAYOUTS: HeroLayout[] = ["split", "bottom", "center"];
+type HeroLayout = "try" | "split" | "bottom" | "center";
+const LAYOUTS: HeroLayout[] = ["try", "split", "bottom", "center"];
 
 export default async function Home({
   searchParams,
@@ -38,19 +39,37 @@ export default async function Home({
   const { data } = await supabase.auth.getClaims();
   if (data?.claims) redirect("/dashboard");
 
-  // The hero layout is set in lib/homepage.ts; ?hero=split|bottom|center
+  // The hero layout is set in lib/homepage.ts; ?hero=try|split|bottom|center
   // previews another one without changing anything
   const { hero } = await searchParams;
   const layout: HeroLayout = LAYOUTS.includes(hero as HeroLayout)
     ? (hero as HeroLayout)
     : HOME.heroLayout;
+  const fullScreen = layout === "bottom" || layout === "center";
 
   const price = await priceLabel();
   const h = HOME;
 
+  const ctas = (
+    <>
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        <Link
+          href={SIGN_UP}
+          className="rounded-xl px-7 py-4 text-lg font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] active:scale-[0.98] transition"
+        >
+          {h.hero.primary}
+        </Link>
+        <a href="#pricing" className="rounded-xl px-6 py-4 text-lg font-semibold border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition">
+          {h.hero.secondary}
+        </a>
+      </div>
+      <p className="mt-4 text-[15px] text-neutral-500 dark:text-neutral-400">{h.hero.note}</p>
+    </>
+  );
+
   return (
     <div className="home w-full text-neutral-900 dark:text-neutral-100">
-      {layout !== "split" ? (
+      {fullScreen ? (
         <HeroFull variant={layout} signUp={SIGN_UP} />
       ) : (
       <>
@@ -74,32 +93,41 @@ export default async function Home({
       </header>
 
       <div>
-        {/* ── hero ── */}
-        <section className="px-4 sm:px-8 max-w-7xl mx-auto pt-8 sm:pt-14 pb-12 sm:pb-16 grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-14 items-center">
-          <div>
-            <h1 className="wide text-[2.6rem] leading-[1.02] sm:text-6xl lg:text-[4.4rem] font-extrabold tracking-[-0.02em]">
-              {h.hero.headline}
-            </h1>
-            <p className="mt-6 text-lg sm:text-xl leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-[34rem]">
-              {h.hero.body}
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href={SIGN_UP}
-                className="rounded-xl px-7 py-4 text-lg font-bold bg-[#CC1010] text-white hover:bg-[#B00D0D] active:scale-[0.98] transition shadow-[0_8px_24px_rgba(204,16,16,0.3)]"
-              >
-                {h.hero.primary}
-              </Link>
-              <a href="#pricing" className="rounded-xl px-6 py-4 text-lg font-semibold border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition">
-                {h.hero.secondary}
-              </a>
+        {layout === "try" ? (
+          /* ── hero: words, then the working practice player ── */
+          <section className="px-4 sm:px-8 max-w-7xl mx-auto pt-8 sm:pt-12 pb-12 sm:pb-16">
+            <div className="grid lg:grid-cols-[1.15fr_1fr] gap-6 lg:gap-14 items-end">
+              <h1 className="wide text-[2.4rem] leading-[1.03] sm:text-6xl lg:text-[4.2rem] font-extrabold tracking-[-0.02em]">
+                {h.hero.headline}
+              </h1>
+              <div>
+                <p className="text-lg sm:text-xl leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-[34rem]">
+                  {h.hero.body}
+                </p>
+                {ctas}
+              </div>
             </div>
-            <p className="mt-4 text-[15px] text-neutral-500 dark:text-neutral-400">{h.hero.note}</p>
-          </div>
-          <div className="rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)]">
-            <HeroVideo />
-          </div>
-        </section>
+            <div className="mt-10 sm:mt-14">
+              <TryIt />
+            </div>
+          </section>
+        ) : (
+          /* ── hero: words beside a looping clip ── */
+          <section className="px-4 sm:px-8 max-w-7xl mx-auto pt-8 sm:pt-14 pb-12 sm:pb-16 grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-14 items-center">
+            <div>
+              <h1 className="wide text-[2.6rem] leading-[1.02] sm:text-6xl lg:text-[4.4rem] font-extrabold tracking-[-0.02em]">
+                {h.hero.headline}
+              </h1>
+              <p className="mt-6 text-lg sm:text-xl leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-[34rem]">
+                {h.hero.body}
+              </p>
+              {ctas}
+            </div>
+            <div className="rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)]">
+              <HeroVideo />
+            </div>
+          </section>
+        )}
 
         {/* ── the belt band: the whole path in one line ── */}
         <section className="px-4 sm:px-8 max-w-7xl mx-auto">
@@ -112,11 +140,37 @@ export default async function Home({
 
       <main>
         {/* full-screen heroes carry the belts along their bottom edge */}
-        {layout !== "split" && (
+        {fullScreen && (
           <p className="px-4 sm:px-8 max-w-7xl mx-auto pt-10 text-lg text-neutral-700 dark:text-neutral-300">
             {h.band.caption}
           </p>
         )}
+
+        {/* ── Rach's video, full width ── */}
+        <section className="mt-16 sm:mt-24">
+          {h.video.url ? (
+            <video
+              src={h.video.url}
+              poster={h.video.poster || undefined}
+              controls
+              playsInline
+              preload="metadata"
+              className="block w-full max-h-[90vh] aspect-video bg-black"
+            />
+          ) : (
+            <div className="w-full aspect-video max-h-[80vh] bg-neutral-900 text-white flex flex-col items-center justify-center gap-4 px-6 text-center">
+              <span className="w-20 h-20 rounded-full bg-[#CC1010] flex items-center justify-center">
+                <Play size={34} fill="currentColor" className="ml-1" aria-hidden />
+              </span>
+              <p className="text-lg text-white/70">{h.video.placeholder}</p>
+            </div>
+          )}
+          {h.video.caption && (
+            <p className="px-4 sm:px-8 max-w-7xl mx-auto mt-4 text-[15px] text-neutral-500 dark:text-neutral-400">
+              {h.video.caption}
+            </p>
+          )}
+        </section>
 
         {/* ── how a belt is earned (a real sequence, so it's numbered) ── */}
         <section className="px-4 sm:px-8 max-w-7xl mx-auto pt-24 sm:pt-32">

@@ -9,10 +9,21 @@
  */
 
 export const HOME = {
-  // Hero layout: "split" (headline beside the video), "bottom" (full-screen
-  // video, headline bottom-left) or "center" (full-screen video, headline
-  // centred). Add ?hero=bottom (etc.) to the homepage address to preview one.
-  heroLayout: "split" as "split" | "bottom" | "center",
+  // Hero layout: "try" (headline, then a working practice player with the
+  // real dial and click), "split" (headline beside a looping clip), "bottom"
+  // or "center" (full-screen video). Add ?hero=split (etc.) to the homepage
+  // address to preview one.
+  heroLayout: "try" as "try" | "split" | "bottom" | "center",
+
+  // Your full-width video, straight after the belt band: put the file in
+  // /public/home and name it here, e.g. "/home/rach.mp4". Leave "" for the
+  // placeholder.
+  video: {
+    url: "",
+    poster: "", // a still to show before it plays, e.g. "/home/rach.jpg"
+    placeholder: "[Rach's video: playing, talking, and showing SpeedDojo]",
+    caption: "",
+  },
 
   metaTitle: "Guitar speed training you can measure",
   metaDescription:
