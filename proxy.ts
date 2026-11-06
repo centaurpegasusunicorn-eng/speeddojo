@@ -11,6 +11,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Pages anyone can open without signing in
 const PUBLIC_PATHS = [
+  "/", // the homepage / sales page (signed-in students are sent on to practice)
+  "/lessons", // lesson sales page (the booking page checks payment itself)
   "/login",
   "/auth",
   "/forgot-password",
