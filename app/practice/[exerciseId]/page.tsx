@@ -592,7 +592,7 @@ export default function PracticePage() {
 
         <div className="order-2 h-14 flex items-center gap-1 lg:hidden">
           <ThemeToggle />
-          <ProfileButton className="ml-1" />
+          <ProfileButton className="ml-1" ringColor={stripColor} />
         </div>
 
         <div className="order-3 w-full lg:order-2 lg:w-auto min-w-0 flex items-start gap-3">
@@ -623,7 +623,7 @@ export default function PracticePage() {
             <StatPill label="Practised today" value={formatDuration(todaySeconds)} />
             <span className="hidden lg:contents">
               <ThemeToggle className="ml-2" />
-              <ProfileButton className="ml-1" />
+              <ProfileButton className="ml-1" ringColor={stripColor} />
             </span>
           </div>
         </div>
