@@ -7,7 +7,7 @@ import { loadDay1 } from "@/lib/day1";
 
 /*
  * The round button in the top bar that opens My Dojo: their Day 1 photo,
- * or their initial if they haven't taken one. A 2px ring inside it shows
+ * or their initial if they haven't taken one. A 4px ring inside it shows
  * the belt they're on (with a faint edge so a White belt still shows).
  */
 export default function ProfileButton({
@@ -15,7 +15,7 @@ export default function ProfileButton({
   ringColor,
 }: {
   className?: string;
-  /** colour of the 2px ring inside the photo: the belt they're on */
+  /** colour of the 4px ring inside the photo: the belt they're on */
   ringColor?: string;
 }) {
   const [photo, setPhoto] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export default function ProfileButton({
         <span
           aria-hidden
           className="absolute inset-0 rounded-full pointer-events-none"
-          style={{ boxShadow: `inset 0 0 0 2px ${ringColor}, inset 0 0 0 3px rgba(0,0,0,0.18)` }}
+          style={{ boxShadow: `inset 0 0 0 4px ${ringColor}, inset 0 0 0 5px rgba(0,0,0,0.18)` }}
         />
       )}
     </Link>
